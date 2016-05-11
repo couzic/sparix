@@ -10,7 +10,7 @@ import * as isEqual from 'lodash.isequal';
 import {CoreEvent, EventBus} from './event-bus';
 import {freeze} from './freeze';
 
-interface Diff {
+export interface Diff {
 }
 
 export interface Updater<State> {
@@ -30,7 +30,7 @@ export interface Operation<State> {
   (state: State): OperationResult<State>;
 }
 
-interface CoreEventHandler<Event extends CoreEvent, State> {
+export interface CoreEventHandler<Event extends CoreEvent, State> {
   (state: State, event: Event): OperationResult<State>;
 }
 

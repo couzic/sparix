@@ -6,11 +6,6 @@ const webpack = require('webpack');
 const helpers = require('./helpers');
 
 /*
- * Webpack Plugins
- */
-const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
-
-/*
  * Webpack configuration
  *
  * See: http://webpack.github.io/docs/configuration.html#cli
@@ -63,7 +58,7 @@ module.exports = {
        */
       {
         test: /\.ts$/,
-        loader: 'awesome-typescript-loader',
+        loader: 'ts',
         exclude: [/\.spec.ts$/]
       }
 
@@ -77,14 +72,6 @@ module.exports = {
    * See: http://webpack.github.io/docs/configuration.html#plugins
    */
   plugins: [
-
-    /*
-     * Plugin: ForkCheckerPlugin
-     * Description: Do type checking in a separate process, so webpack don't need to wait.
-     *
-     * See: https://github.com/s-panferov/awesome-typescript-loader#forkchecker-boolean-defaultfalse
-     */
-    new ForkCheckerPlugin(),
 
     /*
      * Plugin: OccurenceOrderPlugin

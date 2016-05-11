@@ -11,3 +11,5 @@ npm-debug.log
 tsconfig.json
 tslint.json
 typings.json
+
+.idea
