@@ -11,11 +11,6 @@ const ProvidePlugin = require('webpack/lib/ProvidePlugin');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 
 /**
- * Webpack Constants
- */
-const ENV = process.env.ENV = process.env.NODE_ENV = 'test';
-
-/**
  * Webpack configuration
  *
  * See: http://webpack.github.io/docs/configuration.html#cli
@@ -86,11 +81,10 @@ module.exports = {
         test: /\.js$/,
         loader: 'source-map-loader',
         exclude: [
-        // these packages have problems with their sourcemaps
-        helpers.root('node_modules/rxjs'),
-        helpers.root('node_modules/@angular2-material'),
-        helpers.root('node_modules/@angular')
-      ]}
+          // these packages have problems with their sourcemaps
+          helpers.root('node_modules/rxjs')
+        ]
+      }
 
     ],
 
@@ -103,50 +97,10 @@ module.exports = {
      * See: http://webpack.github.io/docs/configuration.html#module-loaders
      */
     loaders: [
-
-      /**
-       * Typescript loader support for .ts and Angular 2 async routes via .async.ts
-       *
-       * See: https://github.com/s-panferov/awesome-typescript-loader
-       */
       {
         test: /\.ts$/,
-        loader: 'awesome-typescript-loader',
-        query: {
-          compilerOptions: {
-
-            // Remove TypeScript helpers to be injected
-            // below by DefinePlugin
-            removeComments: true
-
-          }
-        },
-        exclude: [/\.e2e\.ts$/]
-      },
-
-      /**
-       * Json loader support for *.json files.
-       *
-       * See: https://github.com/webpack/json-loader
-       */
-      { test: /\.json$/, loader: 'json-loader', exclude: [helpers.root('src/index.html')] },
-
-      /**
-       * Raw loader support for *.css files
-       * Returns file content as string
-       *
-       * See: https://github.com/webpack/raw-loader
-       */
-      { test: /\.css$/, loader: 'raw-loader', exclude: [helpers.root('src/index.html')] },
-
-      /**
-       * Raw loader support for *.html
-       * Returns file content as string
-       *
-       * See: https://github.com/webpack/raw-loader
-       */
-      { test: /\.html$/, loader: 'raw-loader', exclude: [helpers.root('src/index.html')] }
-
+        loader: 'ts-loader'
+      }
     ],
 
     /**
@@ -166,7 +120,7 @@ module.exports = {
         test: /\.(js|ts)$/, loader: 'istanbul-instrumenter-loader',
         include: helpers.root('src'),
         exclude: [
-          /\.(e2e|spec)\.ts$/,
+          /\.spec\.ts$/,
           /node_modules/
         ]
       }
@@ -174,35 +128,9 @@ module.exports = {
     ]
   },
 
-  /**
-   * Add additional plugins to the compiler.
-   *
-   * See: http://webpack.github.io/docs/configuration.html#plugins
-   */
-  plugins: [
-
-    /**
-     * Plugin: DefinePlugin
-     * Description: Define free variables.
-     * Useful for having development builds with debug logging or adding global constants.
-     *
-     * Environment helpers
-     *
-     * See: https://webpack.github.io/docs/list-of-plugins.html#defineplugin
-     */
-    // NOTE: when adding more properties make sure you include them in custom-typings.d.ts
-    new DefinePlugin({
-      'ENV': JSON.stringify(ENV),
-      'HMR': false,
-      'process.env': {
-        'ENV': JSON.stringify(ENV),
-        'NODE_ENV': JSON.stringify(ENV),
-        'HMR': false
-      }
-    })
-
-
-  ],
+  ts: {
+    configFileName: 'tsconfig.test.json'
+  },
 
   /**
    * Static analysis linter for TypeScript advanced options configuration

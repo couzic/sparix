@@ -7,9 +7,12 @@ typings
 .gitignore
 .npmignore
 karma.conf.js
+LICENCE.txt
 npm-debug.log
 tsconfig.json
 tslint.json
 typings.json
 
+# IDE #
 .idea
+*.swp

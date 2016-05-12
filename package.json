@@ -2,15 +2,18 @@
   "name": "sparix",
   "version": "0.0.2",
   "description": "Single Page Application state management powered with RxJS",
-  "main": "./dist/sparix.min.js",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "scripts": {
-    "pretest": "typings install",
+    "postinstall": "typings install",
     "test": "karma start",
     "watch:test": "npm run test -- --auto-watch --no-single-run",
-    "prebuild": "rm -rf ./dist",
-    "build": "webpack --config config/webpack.prod.js  --progress --profile --colors --display-error-details --display-cached --bail",
-    "postbuild": "npm run del-typings && dts-generator --name sparix --project ./ --out dist/sparix.d.ts",
-    "del-typings": "rm -rf ./typings"
+    "prebuild": "shx rm -rf ./lib",
+    "build": "tsc --project tsconfig.build.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:micouz/sparix.git"
   },
   "author": {
     "name": "Mikael Couzic",
@@ -37,6 +40,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
     "phantomjs-prebuilt": "^2.1.7",
+    "shx": "^0.1.2",
     "source-map-loader": "^0.1.5",
     "ts-helpers": "^1.1.1",
     "ts-loader": "^0.8.2",

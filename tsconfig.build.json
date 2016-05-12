@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es5",
+    "outDir": "lib",
+    "declaration": true,
+    "sourceMap": true
+  },
+  "files": [
+    "src/index.ts",
+    "src/custom-typings.d.ts",
+    "node_modules/rxjs/Rx.d.ts",
+    "typings/main/ambient/core-js/index.d.ts"
+  ]
+}

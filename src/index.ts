@@ -1,2 +1,2 @@
-export * from 'event-bus';
-export * from 'store';
+export * from './event-bus';
+export * from './store';
