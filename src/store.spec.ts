@@ -1,4 +1,4 @@
-import {Store, Updater, Operation, OperationResult} from './store';
+import {Store, Updater, Operation, OperationResult, CoreEventHandler} from './store';
 import {EventBus, CoreEvent} from './event-bus';
 
 class State {
@@ -43,6 +43,10 @@ class TestStore extends Store<State> {
 
   applyResult(operationResult: OperationResult<State>) {
     super.applyResult(operationResult);
+  }
+
+  on<Event extends CoreEvent>(eventType: Function, handler: CoreEventHandler<Event>) {
+    super.on(eventType, handler);
   }
 }
 
@@ -130,6 +134,19 @@ describe('Store', () => {
     expect(state.prop1).toEqual(124);
     expect(sentEvents.length).toEqual(1);
     expect(sentEvents[0]).toBe(event);
+  });
+
+  describe('when listening for events', () => {
+    let event: Event = new Event();
+    let caughtEvent: Event;
+    beforeEach(() => {
+      store.on(Event, e => caughtEvent = e);
+      eventBus.dispatch(event);
+    });
+
+    it('handles event', () => {
+      expect(caughtEvent).toBe(event);
+    });
   });
 
 });

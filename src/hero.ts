@@ -32,10 +32,10 @@ export class Hero extends Store<HeroState> {
 
   constructor(eventBus: EventBus) {
     super(eventBus, initialState);
-    this.on(MonsterDied, (state: HeroState, event: MonsterDied) => ({
-      update: {level: state.level + 1},
-      event: new HeroGainedLevel(state.level + 1)
-    }));
+    this.on(MonsterDied, () => {
+      this.update(s => ({level: s.level + 1}));
+      this.dispatch(s => new HeroGainedLevel(s.level));
+    });
   }
 
   attack() {

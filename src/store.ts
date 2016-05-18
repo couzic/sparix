@@ -30,8 +30,8 @@ export interface Operation<State> {
   (state: State): OperationResult<State>;
 }
 
-export interface CoreEventHandler<Event extends CoreEvent, State> {
-  (state: State, event: Event): OperationResult<State>;
+export interface CoreEventHandler<Event extends CoreEvent> {
+  (event: Event): void;
 }
 
 class StateAndEvent<State> {
@@ -50,8 +50,7 @@ export class Store<State> {
     this.stateSubject = new BehaviorSubject<State>(initialState);
 
     eventBus.event$
-      .map(event => state => this.handleEvent(state, event))
-      .subscribe(this.operation$);
+      .subscribe(event => this.handleEvent(event));
 
     function operationReducer(previousStateAndEvent: StateAndEvent<State>, operation: Operation<State>) {
       const state = previousStateAndEvent.state;
@@ -99,7 +98,7 @@ export class Store<State> {
     return this.stateSubject.getValue();
   }
 
-  protected on<Event extends CoreEvent>(eventType: Function, handler: CoreEventHandler<Event, State>) {
+  protected on<Event extends CoreEvent>(eventType: Function, handler: CoreEventHandler<Event>) {
     this.eventHandlers[eventType.name] = handler;
   }
 
@@ -139,8 +138,10 @@ export class Store<State> {
     this.operation$.next(state => operationResult);
   }
 
-  private handleEvent<Event extends CoreEvent>(state: State, event: Event): OperationResult<State> {
-    const handler: CoreEventHandler<Event, State> = this.eventHandlers[event.constructor.name];
-    if (handler) return handler(state, event);
+  private handleEvent<Event extends CoreEvent>(event: Event): void {
+    const handler: CoreEventHandler<Event> = this.eventHandlers[event.constructor.name];
+    if (handler) {
+      handler(event);
+    }
   }
 }
