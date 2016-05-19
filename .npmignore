@@ -9,7 +9,9 @@ typings
 karma.conf.js
 LICENCE.txt
 npm-debug.log
+tsconfig.build.json
 tsconfig.json
+tsconfig.test.json
 tslint.json
 typings.json
 

@@ -1,4 +1,4 @@
-import {EventBus, CoreEvent} from './event-bus';
+import {EventQueue, CoreEvent} from './event-queue';
 
 class Event implements CoreEvent {
   public val = 42;
@@ -6,11 +6,11 @@ class Event implements CoreEvent {
 
 describe('EventBus', () => {
 
-  let eventBus: EventBus;
+  let eventBus: EventQueue;
   let dispatchedEvents: CoreEvent[];
 
   beforeEach(() => {
-    eventBus = new EventBus();
+    eventBus = new EventQueue();
     dispatchedEvents = [];
     eventBus.event$.subscribe(event => dispatchedEvents.push(event));
   });

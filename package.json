@@ -1,6 +1,6 @@
 {
   "name": "sparix",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Single Page Application state management powered with RxJS",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",

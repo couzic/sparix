@@ -1,16 +1,16 @@
 import {Hero, HeroState, HeroAttacked, HeroGainedLevel} from './hero';
-import {EventBus, CoreEvent} from './event-bus';
+import {EventQueue, CoreEvent} from './event-queue';
 import {MonsterDied} from './monster';
 
 describe('Hero', () => {
 
   let hero: Hero;
   let state: HeroState;
-  let eventBus: EventBus;
+  let eventBus: EventQueue;
   let sentEvents: CoreEvent[];
 
   beforeEach(() => {
-    eventBus = new EventBus();
+    eventBus = new EventQueue();
     hero = new Hero(eventBus);
     hero.state$.subscribe(newState => state = newState);
     sentEvents = [];

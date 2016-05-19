@@ -7,7 +7,7 @@ import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import immupdate from 'immupdate';
 import * as isEqual from 'lodash.isequal';
-import {CoreEvent, EventBus} from './event-bus';
+import {CoreEvent, EventQueue} from './event-queue';
 import {freeze} from './freeze';
 
 export interface Diff {
@@ -46,7 +46,7 @@ export class Store<State> {
 
   private operation$ = new Subject<Operation<State>>();
 
-  constructor(private eventBus: EventBus, initialState: State) {
+  constructor(private eventBus: EventQueue, initialState: State) {
     this.stateSubject = new BehaviorSubject<State>(initialState);
 
     eventBus.event$

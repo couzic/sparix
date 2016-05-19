@@ -5,7 +5,7 @@ import {freeze} from './freeze';
 export interface CoreEvent {
 }
 
-export class EventBus {
+export class EventQueue {
 
   private output$: Observable<CoreEvent>;
   private subscribers: Subscriber<CoreEvent>[] = [];

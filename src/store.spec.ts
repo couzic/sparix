@@ -1,5 +1,5 @@
 import {Store, Updater, Operation, OperationResult, CoreEventHandler} from './store';
-import {EventBus, CoreEvent} from './event-bus';
+import {EventQueue, CoreEvent} from './event-queue';
 
 class State {
   prop1: number;
@@ -17,7 +17,7 @@ class Event implements CoreEvent {
 }
 
 class TestStore extends Store<State> {
-  constructor(eventBus: EventBus) {
+  constructor(eventBus: EventQueue) {
     super(eventBus, initialState);
   }
 
@@ -55,12 +55,12 @@ describe('Store', () => {
   let store: TestStore;
   let state: State;
   let stateHistory: State[];
-  let eventBus: EventBus;
+  let eventBus: EventQueue;
   let sentEvents: CoreEvent[];
 
   beforeEach(() => {
     stateHistory = [];
-    eventBus = new EventBus();
+    eventBus = new EventQueue();
     store = new TestStore(eventBus);
     store.state$.subscribe(newState => {
       state = newState;

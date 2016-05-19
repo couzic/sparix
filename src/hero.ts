@@ -1,5 +1,5 @@
 import {Store} from './store';
-import {EventBus, CoreEvent} from './event-bus';
+import {EventQueue, CoreEvent} from './event-queue';
 import {MonsterDied} from './monster';
 
 export class HeroState {
@@ -30,7 +30,7 @@ const incrementAttackCount = state => ({attackCount: state.attackCount + 1});
 
 export class Hero extends Store<HeroState> {
 
-  constructor(eventBus: EventBus) {
+  constructor(eventBus: EventQueue) {
     super(eventBus, initialState);
     this.on(MonsterDied, () => {
       this.update(s => ({level: s.level + 1}));
