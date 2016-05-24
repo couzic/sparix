@@ -94,7 +94,7 @@ export class Store<State> {
     return this.stateSubject.asObservable();
   }
 
-  currentState(): State {
+  get currentState(): State {
     return this.stateSubject.getValue();
   }
 

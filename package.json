@@ -29,7 +29,6 @@
   "devDependencies": {
     "awesome-typescript-loader": "^0.17.0",
     "core-js": "^2.4.0",
-    "dts-generator": "^1.7.0",
     "istanbul-instrumenter-loader": "^0.2.0",
     "jasmine-core": "^2.4.1",
     "karma": "^0.13.22",
@@ -48,6 +47,7 @@
     "tslint": "^3.10.1",
     "tslint-loader": "^2.1.4",
     "typescript": "^1.8.10",
+    "typings": "^0.7.12",
     "webpack": "^1.13.0",
     "webpack-merge": "^0.12.0"
   }
