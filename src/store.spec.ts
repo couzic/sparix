@@ -149,5 +149,20 @@ describe('Store', () => {
     });
   });
 
+  describe('when two successive updaters apply same diff', () => {
+    beforeEach(() => {
+      store.update(s => ({prop2: 'updated'}));
+      store.update(s => ({prop2: 'updated'}));
+    });
+
+    it('the following updater receives a state', () => {
+      store.update(s => {
+        expect(s).toBeDefined();
+        return s;
+      });
+    });
+
+  });
+
 });
 

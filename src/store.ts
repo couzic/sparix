@@ -60,6 +60,8 @@ export class Store<State> {
         const newState = immupdate(state, result.update);
         if (!isEqual(state, newState)) {
           newStateAndEvent.state = newState;
+        } else {
+          newStateAndEvent.state = null;
         }
       }
       if (result && result.event) {
