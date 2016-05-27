@@ -87,11 +87,18 @@ describe('Store', () => {
 
   });
 
-  describe('when an update does not change state values', () => {
-    beforeEach(() => store.updateState({prop1: initialProp1Value}));
+  describe('.map()', () => {
+    let prop1History;
+    beforeEach(() => {
+      prop1History = [];
+      store
+        .map(s => s.prop1)
+        .subscribe(prop1 => prop1History.push(prop1));
+    });
 
-    it('does not send state update notifications', () => {
-      expect(stateHistory.length).toEqual(1);
+    it('does not send subsequent change notifications with same value', () => {
+      store.updateState({});
+      expect(prop1History.length).toEqual(1);
     });
   });
 
@@ -153,6 +160,7 @@ describe('Store', () => {
     beforeEach(() => {
       store.update(s => ({prop2: 'updated'}));
       store.update(s => ({prop2: 'updated'}));
+      store.update(s => ({prop1: 0}));
     });
 
     it('the following updater receives a state', () => {
@@ -160,6 +168,10 @@ describe('Store', () => {
         expect(s).toBeDefined();
         return s;
       });
+    });
+
+    it('stores updates from all updaters', () => {
+      expect(state.prop2).toBeDefined();
     });
 
   });

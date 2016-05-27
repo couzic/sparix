@@ -6,9 +6,12 @@ import {Subject} from 'rxjs/Subject';
 import {Observable} from 'rxjs/Observable';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import immupdate from 'immupdate';
-import * as isEqual from 'lodash.isequal';
 import {CoreEvent, EventQueue} from './event-queue';
 import {freeze} from './freeze';
+
+export interface Mapper<State, R> {
+  (state: State): R;
+}
 
 export interface Diff {
 }
@@ -58,10 +61,8 @@ export class Store<State> {
       const newStateAndEvent: StateAndEvent<State> = new StateAndEvent<State>();
       if (result && result.update) {
         const newState = immupdate(state, result.update);
-        if (!isEqual(state, newState)) {
+        if (newState !== state) {
           newStateAndEvent.state = newState;
-        } else {
-          newStateAndEvent.state = null;
         }
       }
       if (result && result.event) {
@@ -98,6 +99,10 @@ export class Store<State> {
 
   get currentState(): State {
     return this.stateSubject.getValue();
+  }
+
+  map<R>(project: Mapper<R>): Observable<R> {
+    return this.stateSubject.map(project).distinctUntilChanged();
   }
 
   protected on<Event extends CoreEvent>(eventType: Function, handler: CoreEventHandler<Event>) {

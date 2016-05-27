@@ -1,13 +1,13 @@
 {
   "name": "sparix",
-  "version": "0.0.6",
+  "version": "0.0.7-alpha.0",
   "description": "Single Page Application state management powered by RxJS",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "postinstall": "typings install",
     "test": "karma start",
     "watch:test": "npm run test -- --auto-watch --no-single-run",
+    "prepublish": "npm test && npm run build",
     "prebuild": "shx rm -rf ./lib",
     "build": "tsc --project tsconfig.build.json"
   },
