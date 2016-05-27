@@ -1,3 +1,4 @@
+import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/scan';
@@ -101,7 +102,7 @@ export class Store<State> {
     return this.stateSubject.getValue();
   }
 
-  map<R>(project: Mapper<R>): Observable<R> {
+  map<R>(project: Mapper<State, R>): Observable<R> {
     return this.stateSubject.map(project).distinctUntilChanged();
   }
 
