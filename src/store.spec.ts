@@ -4,13 +4,21 @@ import {EventQueue, CoreEvent} from './event-queue';
 class State {
   prop1: number;
   prop2: string;
+  deepObject: {
+    subProp1: number;
+    subProp2: string;
+  };
 }
 
 const initialProp1Value = 42;
 
 const initialState: State = {
   prop1: initialProp1Value,
-  prop2: 'Whatever'
+  prop2: 'Whatever',
+  deepObject: {
+    subProp1: initialProp1Value,
+    subProp2: 'Sub Whatever'
+  }
 };
 
 class Event implements CoreEvent {
@@ -89,16 +97,26 @@ describe('Store', () => {
 
   describe('.map()', () => {
     let prop1History;
+    let deepObjectHistory;
     beforeEach(() => {
       prop1History = [];
+      deepObjectHistory = [];
       store
         .map(s => s.prop1)
         .subscribe(prop1 => prop1History.push(prop1));
+      store
+        .map(s => s.deepObject)
+        .subscribe(deepObj => deepObjectHistory.push(deepObj));
     });
 
     it('does not send subsequent change notifications with same value', () => {
       store.updateState({});
       expect(prop1History.length).toEqual(1);
+    });
+
+    it('does not send subsequent change notifications with same object', () => {
+      store.updateState({prop1: 12});
+      expect(deepObjectHistory.length).toEqual(1);
     });
   });
 

@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "moduleResolution": "node",
     "target": "es5",
     "sourceMap": true,
     "noEmitHelpers": true
   },
-  "exclude": [
-    "node_modules",
-    "typings/main.d.ts",
-    "typings/main"
+  "files": [
+    "src/index.ts",
+    "src/custom-typings.d.ts",
+    "typings/index.d.ts"
   ]
 }

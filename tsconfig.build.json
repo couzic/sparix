@@ -10,7 +10,6 @@
   "files": [
     "src/index.ts",
     "src/custom-typings.d.ts",
-    "node_modules/rxjs/Rx.d.ts",
-    "typings/main/ambient/core-js/index.d.ts"
+    "typings/index.d.ts"
   ]
 }
