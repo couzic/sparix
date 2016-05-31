@@ -38,112 +38,69 @@ export interface CoreEventHandler<Event extends CoreEvent> {
   (event: Event): void;
 }
 
-class StateAndEvent<State> {
-  public state: State;
-  public event: CoreEvent;
-}
-
 export class Store<State> {
 
-  private stateSubject: BehaviorSubject<State>;
+  private update$ = new Subject<Updater<State>>();
+  private stateSubject$: BehaviorSubject<State>;
   private eventHandlers = {};
 
-  private operation$ = new Subject<Operation<State>>();
-
-  constructor(private eventBus: EventQueue, initialState: State) {
-    this.stateSubject = new BehaviorSubject<State>(initialState);
-
+  constructor(private eventBus: EventQueue, private initialState: State) {
     eventBus.event$
       .subscribe(event => this.handleEvent(event));
 
-    function operationReducer(previousStateAndEvent: StateAndEvent<State>, operation: Operation<State>) {
-      const state = previousStateAndEvent.state;
-      const result: OperationResult<State> = operation(state);
-      const newStateAndEvent: StateAndEvent<State> = new StateAndEvent<State>();
-      if (result && result.update) {
-        const newState = immupdate(state, result.update);
-        if (newState !== state) {
-          newStateAndEvent.state = newState;
-        }
-      }
-      if (result && result.event) {
-        newStateAndEvent.event = result.event;
-      }
-      return newStateAndEvent;
+    function stateReducer(previousState: State, operation: Updater<State>) {
+      const diff = operation(previousState);
+      return immupdate(previousState, diff);
     }
 
-    const initialStateAndEvent: StateAndEvent<State> = {
-      state: freeze(initialState),
-      event: null
-    };
-
-    const stateAndEvent$: Observable<StateAndEvent<State>> = this.operation$
-      .scan(operationReducer, initialStateAndEvent)
-      .share();
-
-    stateAndEvent$
-      .map(stateAndEvent => stateAndEvent.state)
-      .filter(Boolean)
+    this.stateSubject$ = new BehaviorSubject(freeze(initialState));
+    this.update$
+      .scan(stateReducer, initialState)
       .map(freeze)
-      .subscribe(this.stateSubject);
-
-    stateAndEvent$
-      .map(stateAndEvent => stateAndEvent.event)
-      .filter(Boolean)
-      .subscribe(event => eventBus.dispatch(event));
-
+      .subscribe(this.stateSubject$);
   }
 
   get state$(): Observable<State> {
-    return this.stateSubject.asObservable();
+    return this.stateSubject$;
   }
 
   get currentState(): State {
-    return this.stateSubject.getValue();
+    return this.stateSubject$.getValue();
   }
 
   map<R>(project: Mapper<State, R>): Observable<R> {
-    return this.stateSubject.map(project).distinctUntilChanged();
+    return this.state$.map(project).distinctUntilChanged();
   }
 
   protected on<Event extends CoreEvent>(eventType: Function, handler: CoreEventHandler<Event>) {
     this.eventHandlers[eventType.name] = handler;
   }
 
-  protected updateState(diff: Diff) {
-    this.operation$.next(state => ({
-      update: diff,
-      event: null
-    }));
+  protected update(updater: Updater<State>) {
+    this.update$.next(updater);
   }
 
-  protected update(updater: Updater<State>) {
-    this.operation$.next(state => ({
-      update: updater(state),
-      event: null
-    }));
+  protected updateState(diff: Diff) {
+    this.update$.next(state => diff);
   }
 
   protected dispatchEvent(event: CoreEvent) {
-    this.operation$.next(state => ({
-      update: null,
-      event
-    }));
+    this.eventBus.dispatch(event);
   }
 
   protected dispatch(eventProvider: EventProvider<State>) {
-    this.operation$.next(state => ({
-      update: null,
-      event: eventProvider(state)
-    }));
+    this.eventBus.dispatch(eventProvider(this.stateSubject$.getValue()));
   }
 
   protected execute(operation: Operation<State>) {
-    this.operation$.next(operation);
+    const result = operation(this.stateSubject$.getValue());
+    this.updateState(result.update);
+    this.dispatchEvent(result.event);
   }
 
   protected applyResult(operationResult: OperationResult<State>) {
-    this.operation$.next(state => operationResult);
+    this.updateState(operationResult.update);
+    this.dispatchEvent(operationResult.event);
   }
 
   private handleEvent<Event extends CoreEvent>(event: Event): void {
