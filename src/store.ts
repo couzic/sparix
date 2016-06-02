@@ -42,7 +42,7 @@ export class Store<State> {
 
   private update$ = new Subject<Updater<State>>();
   private stateSubject$: BehaviorSubject<State>;
-  private eventHandlers = {};
+  private eventHandlers = new Map<Function, CoreEventHandler<any>>();
 
   constructor(private eventBus: EventQueue, private initialState: State) {
     eventBus.event$
@@ -72,10 +72,6 @@ export class Store<State> {
     return this.state$.map(project).distinctUntilChanged();
   }
 
-  protected on<Event extends CoreEvent>(eventType: Function, handler: CoreEventHandler<Event>) {
-    this.eventHandlers[eventType.name] = handler;
-  }
-
   protected update(updater: Updater<State>) {
     this.update$.next(updater);
   }
@@ -103,8 +99,12 @@ export class Store<State> {
     this.dispatchEvent(operationResult.event);
   }
 
+  protected on<Event extends CoreEvent>(eventType: Function, handler: CoreEventHandler<Event>) {
+    this.eventHandlers.set(eventType, handler);
+  }
+
   private handleEvent<Event extends CoreEvent>(event: Event): void {
-    const handler: CoreEventHandler<Event> = this.eventHandlers[event.constructor.name];
+    const handler: CoreEventHandler<Event> = this.eventHandlers.get(event.constructor);
     if (handler) {
       handler(event);
     }
