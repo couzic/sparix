@@ -53,8 +53,8 @@ class TestStore extends Store<State> {
     super.applyResult(operationResult);
   }
 
-  on<Event extends CoreEvent>(eventType: Function, handler: CoreEventHandler<Event>) {
-    super.on(eventType, handler);
+  on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: new (...params) => Event, handler: Handler) {
+    super.on(eventClass, handler);
   }
 }
 

@@ -99,8 +99,8 @@ export class Store<State extends Object> {
     this.dispatchEvent(operationResult.event);
   }
 
-  protected on<Event extends CoreEvent>(eventType: Function, handler: CoreEventHandler<Event>) {
-    this.eventHandlers.set(eventType, handler);
+  protected on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: new (...params) => Event, handler: Handler) {
+    this.eventHandlers.set(eventClass, handler);
   }
 
   private handleEvent<Event extends CoreEvent>(event: Event): void {
