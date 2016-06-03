@@ -1,10 +1,10 @@
 # sparix
 
-##### Single Page Application state management powered by RxJS
+#### Single Page Application state management powered by RxJS
 ###### Inspired by Flux, Redux, Hexagonal Architecture and more..
 
 ### Introduction
-This project aims to alleviate the pain in SPA development by providing a set of opiniated tools and patterns to model the application core's state. In the sparix world, the state is encapsulated in Stores, which are responsible for updating the state. This state is made publically available as an Observable, or in other words as a succession of state transitions (which might remind you of redux). Several stores can communicate between themselves by dispatching global events.
+This project aims to alleviate the pain in SPA development by providing a set of opiniated tools and patterns to model the application core's state, in a simple, easily testable and immutable way. In the sparix world, the state is encapsulated in Stores, which are responsible for updating the state. This state is made publically available as an Observable, or in other words as a succession of state transitions. Several stores can communicate between themselves by dispatching global events.
 
 ### What is sparix ?
 First, it's a pattern (or set of patterns). Second, it's an implementation based on RxJS. The implementation is quite trivial, and it would only take a few hours to migrate it to another reactive library. However, since the SPA world will soon be dominated by two giants, React and Angular2, and since the latter ships with RxJS, it made sense to use this library for the reference implementation of sparix.
@@ -14,7 +14,14 @@ In redux, when you need to update the state, you dispatch an action. But if you 
 * Actions that target a single reducer, to update a single subset of the state tree. Their names are usually in imperative form (*ADD_TODO*, *INCREMENT_COUNTER*...). I call them **Updaters**.
 * Actions that target one or many reducers, to notify the system that something happened. Their names are usually in declarative form (*TODO_SAVED*, *TODO_SAVE_FAILED*...). I call them **Events**.
  
-My claim is that actions are too heavy a mechanism when the goal is simply to apply an update on a single Store (as in most cases). In sparix, a Store can directly update its state with no more ceremony than:
+My claim is that actions are too heavy a mechanism when the goal is simply to update a single Store's state (as in most cases). In sparix, a Store can directly update its state with no more ceremony than:
+```typescript
+// Increment counter
+this.update(state => ({
+    counter: state.counter + 1
+}));
+```
+I like to think of these state updaters as anonymous actions. In redux, it would be like dispatching a reducer. But what about action creators ? Well, we don't need them really: 
 ```typescript
 class SomeStore extends Store<SomeState> {
     // constructor
@@ -25,14 +32,7 @@ class SomeStore extends Store<SomeState> {
     }
 }
 ```
-I like to think of it as an anonymous action. The `incrementCounter()` method, our "*anonymous action creator*", becomes part of the Store's public API. You no longer need to dispatch a global action, just call the method !
-
-### Goals
-* Simplicity
-* Simplicity
-* Immutability
-* Testability
-* Simplicity
+Here, the `incrementCounter()` method is part of the Store's public API. You no longer need to dispatch a global action created by an action creator. Just call the method !
 
 ## Philosophy
 
@@ -48,17 +48,28 @@ So what do you put in the core ? The answer is quite simple: **everything else**
 So back to sparix. It will help you model an application core that does not depend on third-party libraries and frameworks, with two exceptions being RxJS and sparix itself. But that's not much of a problem. Observables are on their way of becoming a standard ECMAScript feature, and sparix is a non-intrusive library, which makes it easy to model only a subset of your application core with it.
 
 ### Immutablility
+In sparix, the state is modeled as an `Observable<State>`, an immutable stream of immutable states. There can be no side effects. It's as simple as that.
 
 ### Testability
+Sparix introduces the concept of Diamond Architecture. Stores have two kinds of inputs:
+* Public methods
+* Events
+
+And two kinds of outputs:
+* The stream of states
+* Events
+
+A Store's API is kept simple, and all the complex logic is encapsulated and hidden from the outside, just like you would do with good old Object Oriented  Programming. To test a Store, all you need to do is simulate an input (either by calling its public methods or dispatching an event), and check the output (state or events).
 
 ## Concepts
-
 
 ### Store
 
 Each Store represents a cohesive functional subset of your application's core.
 
-State + Behavior = Store
+Behavior = Core
+
+Stateful core = Store
 
 ### Event
 Event though most of the time you just want to update the state of a single Store, sometimes you want to dispatch an app-wide event that **any** store could decide it is interested in. Or sometimes you know that only a single store will ever listen to a specific event, but you might still decide to use events just to decouple Stores from each other (and I suggest you do !).
