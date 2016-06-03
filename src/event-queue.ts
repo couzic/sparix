@@ -2,6 +2,7 @@ import {Subscriber} from 'rxjs/Subscriber';
 import {Observable} from 'rxjs/Observable';
 import {freeze} from './freeze';
 import {Observer} from 'rxjs/Rx';
+import {EventClass} from './event-class';
 
 export interface CoreEvent {
 }
@@ -55,7 +56,7 @@ export class EventQueue implements Observer<CoreEvent> {
     return this.output$;
   }
 
-  filter<Event extends CoreEvent>(eventClass: new (...params) => Event): Observable<Event> {
+  filter<Event extends CoreEvent>(eventClass: EventClass<Event>): Observable<Event> {
     return <Observable<Event>> this.event$
       .filter(event => event.constructor === eventClass);
   }

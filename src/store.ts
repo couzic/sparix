@@ -9,6 +9,7 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import immupdate from 'immupdate';
 import {CoreEvent, EventQueue} from './event-queue';
 import {freeze} from './freeze';
+import {EventClass} from './event-class';
 
 export interface Mapper<State, R> {
   (state: State): R;
@@ -42,7 +43,7 @@ export class Store<State extends Object> {
 
   private update$ = new Subject<Updater<State>>();
   private stateSubject$: BehaviorSubject<State>;
-  private eventHandlers = new Map<Function, CoreEventHandler<any>>();
+  private eventHandlers = new Map<EventClass<any>, CoreEventHandler<any>>();
 
   constructor(private eventBus: EventQueue, private initialState: State) {
     eventBus.event$
@@ -99,12 +100,13 @@ export class Store<State extends Object> {
     this.dispatchEvent(operationResult.event);
   }
 
-  protected on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: new (...params) => Event, handler: Handler) {
+  protected on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: EventClass<Event>,
+                                                                                 handler: Handler) {
     this.eventHandlers.set(eventClass, handler);
   }
 
   private handleEvent<Event extends CoreEvent>(event: Event): void {
-    const handler: CoreEventHandler<Event> = this.eventHandlers.get(event.constructor);
+    const handler: CoreEventHandler<Event> = this.eventHandlers.get(<EventClass<Event>> event.constructor);
     if (handler) {
       handler(event);
     }

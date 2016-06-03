@@ -1,5 +1,6 @@
 import {Store, Updater, Operation, OperationResult, CoreEventHandler} from './store';
 import {EventQueue, CoreEvent} from './event-queue';
+import {EventClass} from './event-class';
 
 class State {
   prop1: number;
@@ -53,7 +54,8 @@ class TestStore extends Store<State> {
     super.applyResult(operationResult);
   }
 
-  on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: new (...params) => Event, handler: Handler) {
+  on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: EventClass<Event>,
+                                                                       handler: Handler) {
     super.on(eventClass, handler);
   }
 }
