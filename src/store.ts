@@ -38,7 +38,7 @@ export interface CoreEventHandler<Event extends CoreEvent> {
   (event: Event): void;
 }
 
-export class Store<State> {
+export class Store<State extends Object> {
 
   private update$ = new Subject<Updater<State>>();
   private stateSubject$: BehaviorSubject<State>;
@@ -53,7 +53,7 @@ export class Store<State> {
       return immupdate(previousState, diff);
     }
 
-    this.stateSubject$ = new BehaviorSubject(freeze(initialState));
+    this.stateSubject$ = new BehaviorSubject<State>(freeze(initialState));
     this.update$
       .scan(stateReducer, initialState)
       .map(freeze)

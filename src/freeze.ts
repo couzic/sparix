@@ -1,4 +1,4 @@
-export function freeze(o) {
+export function freeze<T extends Object>(o: T): T {
   Object.freeze(o);
 
   Object.getOwnPropertyNames(o).forEach(function (prop) {
