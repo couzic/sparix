@@ -70,6 +70,14 @@ describe('EventBus', () => {
       expect(filteredEvents.length).toBe(1);
     });
 
+    it('can filter Events which have parametrized constructor', () => {
+      class SomeEvent {
+        constructor(val: number) {
+        }
+      }
+      eventQueue.filter(SomeEvent);
+    });
+
   });
 
 });

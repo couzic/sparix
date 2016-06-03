@@ -55,7 +55,7 @@ export class EventQueue implements Observer<CoreEvent> {
     return this.output$;
   }
 
-  filter<Event extends CoreEvent>(eventClass: new () => Event): Observable<Event> {
+  filter<Event extends CoreEvent>(eventClass: new (...params) => Event): Observable<Event> {
     return <Observable<Event>> this.event$
       .filter(event => event.constructor === eventClass);
   }
