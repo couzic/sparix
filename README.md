@@ -6,6 +6,88 @@
 ### Introduction
 This project aims to alleviate the pain in SPA development by providing a set of opiniated tools and patterns to model the application core's state, in a simple, easily testable and immutable way. In the sparix world, the state is encapsulated in Stores, which are responsible for updating the state. This state is made publically available as an Observable, or in other words as a succession of state transitions. Several stores can communicate between themselves by dispatching global events.
 
+### Getting Started
+
+#### Install
+```sh
+$ npm i -S sparix rxjs
+```
+
+#### Create a Store
+```ts
+import {Store, EventQueue} from 'sparix'
+
+export interface CounterState {
+    count: number
+}
+
+const initialState: CounterState = {
+    count: 0
+}
+
+export class Counter extends Store<CounterState> {
+    constructor(eventQueue: EventQueue) {
+        super(eventQueue, initialState)
+    }
+    
+    increment() {
+        this.update(state => ({count: state.count + 1}))
+    }
+}
+```
+
+#### Consume the Store's state
+```ts
+import {Counter} from './counter'
+
+const counter: Counter = ... // Get counter instance from exported module or dependency injection
+
+// Recommended way
+const count$: Observable<number> = counter.filter(state => state.count)
+
+// Alternative way (useful for testing)
+expect(counter.currentState.count).toEqual(0)
+counter.increment()
+expect(counter.currentState.count).toEqual(1)
+```
+
+#### Dispatch an Event
+```ts
+export class CountIncremented {
+    constructor(public newCount: number) {}
+}
+
+export class Counter extends Store<CounterState> {
+    // constructor
+    
+    increment() {
+        this.update(state => ({count: state.count + 1}))
+        this.dispatch(state => new CountIncremented(state.count))
+    }
+}
+```
+
+#### Handle an Event
+```ts
+import {Store, EventQueue} from 'sparix'
+import {CountIncremented} from './counter'
+
+export interface EvenCountState {
+    isEven: boolean
+}
+
+const initialState: EvenCountState = {
+    isEven: true
+}
+
+export class EventCountStore extends Store<EvenCountState> {
+    constructor(eventQueue: EventQueue) {
+        super(eventQueue, initialState)
+        this.on(CountIncrement, event => this.updateState({isEven: event.newCount % 2 === 0}) 
+    }
+}
+```
+
 ### What is sparix ?
 First, it's a pattern (or set of patterns). Second, it's an implementation based on RxJS. The implementation is quite trivial, and it would only take a few hours to migrate it to another reactive library. However, since the SPA world will soon be dominated by two giants, React and Angular2, and since the latter ships with RxJS, it made sense to use this library for the reference implementation of sparix.
 
@@ -75,51 +157,3 @@ Stateful core = Store
 Event though most of the time you just want to update the state of a single Store, sometimes you want to dispatch an app-wide event that **any** store could decide it is interested in. Or sometimes you know that only a single store will ever listen to a specific event, but you might still decide to use events just to decouple Stores from each other (and I suggest you do !).
 
 An event is dispatched to all registered Stores before the next event in the queue gets dispatched.
-
-
-### Getting Started
-```sh
-$ npm i -S sparix
-```
-
-#### Create a Store
-```ts
-import {Store, EventQueue} from 'sparix'
-
-interface HeroState {
-    power: number,
-    level: number
-}
-
-const initialState: HeroState = {
-    power: 1,
-    level: 1
-}
-
-const eventQueue = new EventQueue();
-
-class Hero extends Store<HeroState> {
-    constructor() {
-        super(eventQueue, initialState)
-    }
-    
-    gainLevel() {
-        this.update(state => ({level: state.level + 1}))
-    }
-}
-```
-
-#### Using a Store's state
-```ts
-import {Hero, HeroState} from './hero'
-
-const hero: Hero = new Hero()
-const state$: Observable<HeroState> = hero.state$
-const heroLevel$: Observable<number> = hero.state$.map(state => state.level)
-
-const initialLevel: number = hero.currentState.level
-hero.gainLevel()
-const updatedLevel: number = hero.currentState.level
-console.log(initialLevel) // "1"
-console.log(updatedLevel) // "2"
-```
