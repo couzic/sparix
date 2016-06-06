@@ -73,6 +73,10 @@ export class Store<State extends Object> {
     return this.state$.map(project).distinctUntilChanged();
   }
 
+  filter(predicate: Mapper<State, boolean>): Observable<State> {
+    return this.state$.filter(predicate).distinctUntilChanged();
+  }
+
   protected update(updater: Updater<State>) {
     this.update$.next(updater);
   }

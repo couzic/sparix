@@ -43,7 +43,7 @@ import {Counter} from './counter'
 const counter: Counter = ... // Get counter instance from exported module or dependency injection
 
 // Recommended way
-const count$: Observable<number> = counter.filter(state => state.count)
+const count$: Observable<number> = counter.map(state => state.count)
 
 // Alternative way (useful for testing)
 expect(counter.currentState.count).toEqual(0)
