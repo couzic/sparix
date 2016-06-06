@@ -6,7 +6,7 @@
 ### Introduction
 This project aims to alleviate the pain in SPA development by providing a set of opiniated tools and patterns to model the application core's state, in a simple, easily testable and immutable way. In the sparix world, the state is encapsulated in Stores, which are responsible for updating the state. This state is made publically available as an Observable, or in other words as a succession of state transitions. Several stores can communicate between themselves by dispatching global events.
 
-### Getting Started
+### Quickstart
 
 #### Install
 ```sh
@@ -83,7 +83,7 @@ const initialState: EvenCountState = {
 export class EventCountStore extends Store<EvenCountState> {
     constructor(eventQueue: EventQueue) {
         super(eventQueue, initialState)
-        this.on(CountIncrement, event => this.updateState({isEven: event.newCount % 2 === 0}) 
+        this.on(CountIncremented, event => this.updateState({isEven: event.newCount % 2 === 0}) 
     }
 }
 ```
