@@ -1,10 +1,10 @@
-import {Store, Updater, Operation, OperationResult, CoreEventHandler} from './store';
+import {Store, Updater, Operation, OperationResult} from './store';
 import {EventQueue, CoreEvent} from './event-queue';
-import {EventClass} from './event-class';
 
 class State {
   prop1: number;
   prop2: string;
+  dateProp: Date;
   deepObject: {
     subProp1: number;
     subProp2: string;
@@ -16,6 +16,7 @@ const initialProp1Value = 42;
 const initialState: State = {
   prop1: initialProp1Value,
   prop2: 'Whatever',
+  dateProp: new Date(),
   deepObject: {
     subProp1: initialProp1Value,
     subProp2: 'Sub Whatever'
@@ -42,10 +43,6 @@ class TestStore extends Store<State> {
     super.execute(operation);
   }
 
-  dispatchEvent(event: CoreEvent) {
-    super.dispatchEvent(event);
-  }
-
   dispatch(eventProvider: (the: State) => CoreEvent) {
     super.dispatch(eventProvider);
   }
@@ -54,30 +51,23 @@ class TestStore extends Store<State> {
     super.applyResult(operationResult);
   }
 
-  on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: EventClass<Event>,
-                                                                       handler: Handler) {
-    super.on(eventClass, handler);
-  }
 }
 
 describe('Store', () => {
 
   let store: TestStore;
   let state: State;
-  let stateHistory: State[];
-  let eventBus: EventQueue;
+  let eventQueue: EventQueue;
   let sentEvents: CoreEvent[];
 
   beforeEach(() => {
-    stateHistory = [];
-    eventBus = new EventQueue();
-    store = new TestStore(eventBus);
+    eventQueue = new EventQueue();
+    store = new TestStore(eventQueue);
     store.state$.subscribe(newState => {
       state = newState;
-      stateHistory.push(newState);
     });
     sentEvents = [];
-    eventBus.event$.subscribe(event => sentEvents.push(event));
+    eventQueue.event$.subscribe(event => sentEvents.push(event));
   });
 
   describe('initial state', () => {
@@ -127,13 +117,6 @@ describe('Store', () => {
     expect(state.prop1).toEqual(43);
   });
 
-  it('accepts events', () => {
-    const event: Event = new Event();
-    store.dispatchEvent(event);
-    expect(sentEvents.length).toEqual(1);
-    expect(sentEvents[0]).toBe(event);
-  });
-
   it('accepts event providers', () => {
     const event: Event = new Event();
     store.dispatch(s => event);
@@ -163,19 +146,6 @@ describe('Store', () => {
     expect(sentEvents[0]).toBe(event);
   });
 
-  describe('when listening for events', () => {
-    let event: Event = new Event();
-    let caughtEvent: Event;
-    beforeEach(() => {
-      store.on(Event, e => caughtEvent = e);
-      eventBus.dispatch(event);
-    });
-
-    it('handles event', () => {
-      expect(caughtEvent).toBe(event);
-    });
-  });
-
   describe('when two successive updaters apply same diff', () => {
     beforeEach(() => {
       store.update(s => ({prop2: 'updated'}));
@@ -194,6 +164,12 @@ describe('Store', () => {
       expect(state.prop2).toBeDefined();
     });
 
+  });
+
+  it('stores Date', () => {
+    const now = new Date();
+    store.updateState({dateProp: now});
+    expect(state.dateProp).toEqual(now);
   });
 
 });

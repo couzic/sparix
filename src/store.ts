@@ -9,7 +9,7 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import immupdate from 'immupdate';
 import {CoreEvent, EventQueue} from './event-queue';
 import {freeze} from './freeze';
-import {EventClass} from './event-class';
+import {Core} from './core';
 
 export interface Mapper<State, R> {
   (state: State): R;
@@ -35,19 +35,13 @@ export interface Operation<State> {
   (state: State): OperationResult<State>;
 }
 
-export interface CoreEventHandler<Event extends CoreEvent> {
-  (event: Event): void;
-}
-
-export class Store<State extends Object> {
+export class Store<State extends Object> extends Core {
 
   private update$ = new Subject<Updater<State>>();
   private stateSubject$: BehaviorSubject<State>;
-  private eventHandlers = new Map<EventClass<any>, CoreEventHandler<any>>();
 
-  constructor(private eventBus: EventQueue, private initialState: State) {
-    eventBus.event$
-      .subscribe(event => this.handleEvent(event));
+  constructor(eventQueue: EventQueue, private initialState: State) {
+    super(eventQueue);
 
     function stateReducer(previousState: State, operation: Updater<State>) {
       const diff = operation(previousState);
@@ -85,12 +79,8 @@ export class Store<State extends Object> {
     this.update$.next(state => diff);
   }
 
-  protected dispatchEvent(event: CoreEvent) {
-    this.eventBus.dispatch(event);
-  }
-
   protected dispatch(eventProvider: EventProvider<State>) {
-    this.eventBus.dispatch(eventProvider(this.stateSubject$.getValue()));
+    this.dispatchEvent(eventProvider(this.stateSubject$.getValue()));
   }
 
   protected execute(operation: Operation<State>) {
@@ -104,15 +94,4 @@ export class Store<State extends Object> {
     this.dispatchEvent(operationResult.event);
   }
 
-  protected on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: EventClass<Event>,
-                                                                                 handler: Handler) {
-    this.eventHandlers.set(eventClass, handler);
-  }
-
-  private handleEvent<Event extends CoreEvent>(event: Event): void {
-    const handler: CoreEventHandler<Event> = this.eventHandlers.get(<EventClass<Event>> event.constructor);
-    if (handler) {
-      handler(event);
-    }
-  }
 }
