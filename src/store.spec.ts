@@ -1,5 +1,6 @@
 import {Store, Updater, Operation, OperationResult} from './store';
 import {EventQueue, CoreEvent} from './event-queue';
+import {remove} from './util';
 
 class State {
   prop1: number;
@@ -9,6 +10,7 @@ class State {
     subProp1: number;
     subProp2: string;
   };
+  arrayProp: string[];
 }
 
 const initialProp1Value = 42;
@@ -20,7 +22,8 @@ const initialState: State = {
   deepObject: {
     subProp1: initialProp1Value,
     subProp2: 'Sub Whatever'
-  }
+  },
+  arrayProp: ['1', '2', '3']
 };
 
 class Event implements CoreEvent {
@@ -170,6 +173,12 @@ describe('Store', () => {
     const now = new Date();
     store.updateState({dateProp: () => now});
     expect(state.dateProp).toEqual(now);
+  });
+
+  it('removes from string array', () => {
+    const two = '2';
+    store.updateState({arrayProp: remove(two)});
+    expect(state.arrayProp).toEqual(['1', '3']);
   });
 
 });
