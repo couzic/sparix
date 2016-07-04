@@ -1,5 +1,7 @@
 # sparix
 
+## DISCLAIMER: Serious WIP !!!
+
 #### Single Page Application state management powered by RxJS
 ###### Inspired by Flux, Redux, Hexagonal Architecture and more..
 
