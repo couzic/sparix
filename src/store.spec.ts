@@ -168,7 +168,7 @@ describe('Store', () => {
 
   it('stores Date', () => {
     const now = new Date();
-    store.updateState({dateProp: now});
+    store.updateState({dateProp: () => now});
     expect(state.dateProp).toEqual(now);
   });
 

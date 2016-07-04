@@ -15,11 +15,8 @@ export interface Mapper<State, R> {
   (state: State): R;
 }
 
-export interface Diff {
-}
-
 export interface Updater<State> {
-  (state: State): Diff;
+  (state: State): Object;
 }
 
 export interface EventProvider<State> {
@@ -27,7 +24,7 @@ export interface EventProvider<State> {
 }
 
 export class OperationResult<State> {
-  public update: Diff;
+  public update: Object;
   public event: CoreEvent;
 }
 
@@ -75,7 +72,7 @@ export class Store<State extends Object> extends Core {
     this.update$.next(updater);
   }
 
-  protected updateState(diff: Diff) {
+  protected updateState(diff: Object) {
     this.update$.next(state => diff);
   }
 

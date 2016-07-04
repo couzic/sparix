@@ -101,7 +101,7 @@ My claim is that actions are too heavy a mechanism when the goal is simply to up
 // Increment counter
 this.update(state => ({
     counter: state.counter + 1
-}));
+}))
 ```
 I like to think of these state updaters as anonymous actions. In redux, it would be like dispatching a reducer. But what about action creators ? Well, we don't need them really: 
 ```typescript
@@ -110,11 +110,26 @@ class SomeStore extends Store<SomeState> {
     incrementCounter() {
         this.update(state => ({
             counter: state.counter + 1
-        }));
+        }))
     }
 }
 ```
 Here, the `incrementCounter()` method is part of the Store's public API. You no longer need to dispatch a global action created by an action creator. Just call the method !
+
+Note that there is a finer-grained, more declarative way to write these state updaters:
+```typescript
+this.updateState({
+    counter: prevCounter => prevCounter + 1
+})
+```
+Or even better:
+```typescript
+const increment = value => value + 1
+
+this.updateState({
+    counter: increment
+})
+```
 
 ## Philosophy
 
