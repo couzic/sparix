@@ -42,7 +42,8 @@ export class Store<State extends Object> extends Core {
 
     function stateReducer(previousState: State, operation: Updater<State>) {
       const diff = operation(previousState);
-      return immupdate(previousState, diff);
+      if (diff === previousState) return previousState;
+      else return immupdate(previousState, diff);
     }
 
     this.stateSubject$ = new BehaviorSubject<State>(freeze(initialState));
@@ -53,7 +54,7 @@ export class Store<State extends Object> extends Core {
   }
 
   get state$(): Observable<State> {
-    return this.stateSubject$;
+    return this.stateSubject$.distinctUntilChanged();
   }
 
   get currentState(): State {

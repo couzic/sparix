@@ -6,15 +6,15 @@ describe('Hero', () => {
 
   let hero: Hero;
   let state: HeroState;
-  let eventBus: EventQueue;
+  let eventQueue: EventQueue;
   let sentEvents: CoreEvent[];
 
   beforeEach(() => {
-    eventBus = new EventQueue();
-    hero = new Hero(eventBus);
+    eventQueue = new EventQueue();
+    hero = new Hero(eventQueue);
     hero.state$.subscribe(newState => state = newState);
     sentEvents = [];
-    eventBus.event$.subscribe(event => sentEvents.push(event));
+    eventQueue.event$.subscribe(event => sentEvents.push(event));
   });
 
   describe('initial state', () => {
@@ -45,7 +45,7 @@ describe('Hero', () => {
   });
 
   describe('when receives MonsterDied event', () => {
-    beforeEach(() => eventBus.dispatch(new MonsterDied()));
+    beforeEach(() => eventQueue.dispatch(new MonsterDied()));
 
     it('gains a level', () => {
       expect(state.level).toEqual(2);

@@ -60,14 +60,17 @@ describe('Store', () => {
 
   let store: TestStore;
   let state: State;
+  let stateTransitions: State[];
   let eventQueue: EventQueue;
   let sentEvents: CoreEvent[];
 
   beforeEach(() => {
     eventQueue = new EventQueue();
     store = new TestStore(eventQueue);
+    stateTransitions = [];
     store.state$.subscribe(newState => {
       state = newState;
+      stateTransitions.push(newState);
     });
     sentEvents = [];
     eventQueue.event$.subscribe(event => sentEvents.push(event));
@@ -180,6 +183,16 @@ describe('Store', () => {
     store.updateState({arrayProp: remove(two)});
     expect(state.arrayProp).toEqual(['1', '3']);
   });
+
+  describe('when updater returns previous state', () => {
+    beforeEach(() => {
+      store.update(state => state);
+    });
+
+    it('does not create new state transition', () => {
+      expect(stateTransitions.length).toEqual(1);
+    })
+  })
 
 });
 
