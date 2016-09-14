@@ -33,7 +33,7 @@ export class Counter extends Store<CounterState> {
     }
     
     increment() {
-        this.update(state => ({count: state.count + 1}))
+        this.updateState({count: val => val + 1})
     }
 }
 ```
@@ -63,7 +63,7 @@ export class Counter extends Store<CounterState> {
     // constructor
     
     increment() {
-        this.update(state => ({count: state.count + 1}))
+        this.updateState({count: val => val + 1})
         this.dispatch(state => new CountIncremented(state.count))
     }
 }
@@ -99,39 +99,48 @@ In redux, when you need to update the state, you dispatch an action. But if you 
 * Actions that target one or many reducers, to notify the system that something happened. Their names are usually in declarative form (*TODO_SAVED*, *TODO_SAVE_FAILED*...). I call them **Events**.
  
 My claim is that actions are too heavy a mechanism when the goal is simply to update a single Store's state (as in most cases). In sparix, a Store can directly update its state with no more ceremony than:
-```typescript
+```ts
 // Increment counter
 this.update(state => ({
     counter: state.counter + 1
 }))
 ```
-I like to think of these state updaters as anonymous actions. In redux, it would be like dispatching a reducer. But what about action creators ? Well, we don't need them really: 
-```typescript
-class SomeStore extends Store<SomeState> {
-    // constructor
-    incrementCounter() {
-        this.update(state => ({
-            counter: state.counter + 1
-        }))
-    }
-}
-```
-Here, the `incrementCounter()` method is part of the Store's public API. You no longer need to dispatch a global action created by an action creator. Just call the method !
-
-Note that there is a finer-grained, more declarative way to write these state updaters:
-```typescript
+There is a finer-grained, more declarative way to write these state updaters:
+```ts
 this.updateState({
     counter: prevCounter => prevCounter + 1
 })
 ```
 Or even better:
-```typescript
+```ts
 const increment = value => value + 1
 
 this.updateState({
     counter: increment
 })
 ```
+Well, actually you should leverage Ramda's automatic currying:
+```ts
+import {add} from 'ramda'
+
+this.updateState({
+    counter: add(1)
+})
+```
+I like to think of these state updaters as anonymous actions. In redux, it would be like dispatching a reducer. But what about action creators ? Well, we don't need them really: 
+```ts
+const increment = R.add(1)
+
+class SomeStore extends Store<SomeState> {
+    // constructor
+    incrementCounter() {
+        this.updateState({
+            counter: increment
+        })
+    }
+}
+```
+Here, the `incrementCounter()` method is part of the Store's public API. You no longer need to dispatch a global action created by an action creator. Just call the method !
 
 ## Philosophy
 
