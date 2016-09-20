@@ -8,6 +8,7 @@
     "start": "npm run watch:test",
     "test": "karma start",
     "watch:test": "npm run test -- --auto-watch --no-single-run",
+    "postinstall": "typings install",
     "prepublish": "npm test && npm run build",
     "prebuild": "shx rm -rf ./lib",
     "build": "tsc --project tsconfig.build.json"
