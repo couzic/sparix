@@ -30,8 +30,8 @@ class Event implements CoreEvent {
 }
 
 class TestStore extends Store<State> {
-  constructor(eventBus: EventQueue) {
-    super(eventBus, initialState);
+  constructor(eventQueue: EventQueue) {
+    super(initialState, eventQueue);
   }
 
   updateState(diff: any) {

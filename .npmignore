@@ -6,6 +6,7 @@ typings
 .editorconfig
 .gitignore
 .npmignore
+.typingsrc
 karma.conf.js
 LICENCE.txt
 npm-debug.log

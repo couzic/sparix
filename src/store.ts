@@ -37,7 +37,7 @@ export class Store<State extends Object> extends Core {
   private update$ = new Subject<Updater<State>>();
   private stateSubject$: BehaviorSubject<State>;
 
-  constructor(eventQueue: EventQueue, private initialState: State) {
+  constructor(private initialState: State, eventQueue?: EventQueue) {
     super(eventQueue);
 
     function stateReducer(previousState: State, operation: Updater<State>) {

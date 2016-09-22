@@ -30,8 +30,8 @@ const incrementAttackCount = state => ({attackCount: state.attackCount + 1});
 
 export class Hero extends Store<HeroState> {
 
-  constructor(eventBus: EventQueue) {
-    super(eventBus, initialState);
+  constructor(eventQueue: EventQueue) {
+    super(initialState, eventQueue);
     this.on(MonsterDied, () => {
       this.update(s => ({level: s.level + 1}));
       this.dispatch(s => new HeroGainedLevel(s.level));
