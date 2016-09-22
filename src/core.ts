@@ -15,8 +15,9 @@ export class Core {
   private eventHandlers = new Map<EventClass<any>, CoreEventHandler<any>>();
 
   constructor(private eventQueue?: EventQueue) {
-    eventQueue.event$
-      .subscribe(event => this.handleEvent(event));
+    if (eventQueue) {
+      eventQueue.event$.subscribe(event => this.handleEvent(event));
+    }
   }
 
   protected dispatchEvent(event: CoreEvent) {

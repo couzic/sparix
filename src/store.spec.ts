@@ -30,7 +30,7 @@ class Event implements CoreEvent {
 }
 
 class TestStore extends Store<State> {
-  constructor(eventQueue: EventQueue) {
+  constructor(eventQueue?: EventQueue) {
     super(initialState, eventQueue);
   }
 
@@ -55,6 +55,12 @@ class TestStore extends Store<State> {
   }
 
 }
+
+describe('Store with no eventQueue', () => {
+  it('can be instantiated', () => {
+    const store: TestStore = new TestStore()
+  })
+});
 
 describe('Store', () => {
 
