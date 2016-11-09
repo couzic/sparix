@@ -82,7 +82,7 @@ export class Store<State extends Object> extends Core {
   }
 
   protected updateStateAsync(diff$: Observable<Object>) {
-    const updater: AsyncUpdater<State> = diff$.map(diff => (state: State) => diff);
+    const updater: AsyncUpdater<State> = diff$.take(1).map(diff => (state: State) => diff);
     this.update$.next(updater);
   }
 

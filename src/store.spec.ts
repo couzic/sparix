@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {Store, Updater, Operation, OperationResult} from './store';
 import {EventQueue, CoreEvent} from './event-queue';
 import {remove} from './util';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 
 class State {
   prop1: number;
@@ -210,13 +210,12 @@ describe('Store', () => {
     expect(state.prop1).to.equal(1);
   });
 
-  it('notifies only last state to new observer', () => {
-    store.updateStateAsync(Observable.of({prop1: 1}));
-    store.updateStateAsync(Observable.of({prop1: 2}));
-    store.state$
-      .map(state => state)
-      .subscribe(state => console.log(state));
-    store.updateStateAsync(Observable.of({prop1: 1}));
+  it('takes only first emitted diff of asyncDiff', () => {
+    const diff$ = new Subject<Object>();
+    store.updateStateAsync(diff$);
+    diff$.next({prop1: 1});
+    diff$.next({prop1: 2});
+    expect(state.prop1).to.equal(1);
   });
 
 });
