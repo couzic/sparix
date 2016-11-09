@@ -19,6 +19,8 @@ export interface Updater<State> {
   (state: State): Object;
 }
 
+export type AsyncUpdater<State> = Observable<Updater<State>>
+
 export interface EventProvider<State> {
   (state: State): CoreEvent;
 }
@@ -34,20 +36,22 @@ export interface Operation<State> {
 
 export class Store<State extends Object> extends Core {
 
-  private update$ = new Subject<Updater<State>>();
+  private update$ = new Subject<AsyncUpdater<State>>();
   private stateSubject$: BehaviorSubject<State>;
 
   constructor(private initialState: State, eventQueue?: EventQueue) {
     super(eventQueue);
 
-    function stateReducer(previousState: State, operation: Updater<State>) {
+    const stateReducer = (previousState: State, operation: Updater<State>) => {
       const diff = operation(previousState);
       if (diff === previousState) return previousState;
       else return immupdate(previousState, diff);
-    }
+    };
 
     this.stateSubject$ = new BehaviorSubject<State>(freeze(initialState));
+
     this.update$
+      .mergeAll()
       .scan(stateReducer, initialState)
       .map(freeze)
       .subscribe(this.stateSubject$);
@@ -70,11 +74,16 @@ export class Store<State extends Object> extends Core {
   }
 
   protected update(updater: Updater<State>) {
-    this.update$.next(updater);
+    this.update$.next(Observable.of(updater));
   }
 
   protected updateState(diff: Object) {
-    this.update$.next(state => diff);
+    this.update(state => diff);
+  }
+
+  protected updateStateAsync(diff$: Observable<Object>) {
+    const updater: AsyncUpdater<State> = diff$.map(diff => (state: State) => diff);
+    this.update$.next(updater);
   }
 
   protected dispatch(eventProvider: EventProvider<State>) {

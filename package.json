@@ -1,6 +1,6 @@
 {
   "name": "sparix",
-  "version": "0.0.7-alpha.17",
+  "version": "0.0.7-alpha.18",
   "description": "Single Page Application state management powered by RxJS",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -32,7 +32,9 @@
     "@types/chai": "^3.4.34",
     "chai": "^3.5.0",
     "core-js": "^2.4.0",
+    "immupdate": "^0.4.0",
     "mocha": "^3.1.2",
+    "rxjs": "^5.0.0-beta.6",
     "shx": "^0.1.2",
     "ts-loader": "^0.8.2",
     "ts-node": "^1.6.0",

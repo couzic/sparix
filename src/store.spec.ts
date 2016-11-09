@@ -2,6 +2,7 @@ import {expect} from 'chai';
 import {Store, Updater, Operation, OperationResult} from './store';
 import {EventQueue, CoreEvent} from './event-queue';
 import {remove} from './util';
+import {Observable} from 'rxjs';
 
 class State {
   prop1: number;
@@ -55,6 +56,9 @@ class TestStore extends Store<State> {
     super.applyResult(operationResult);
   }
 
+  updateStateAsync(diff$: Observable<Object>) {
+    super.updateStateAsync(diff$);
+  }
 }
 
 describe('Store with no eventQueue', () => {
@@ -199,7 +203,21 @@ describe('Store', () => {
     it('does not create new state transition', () => {
       expect(stateTransitions.length).to.equal(1);
     })
-  })
+  });
+
+  it('accepts Observable diff', () => {
+    store.updateStateAsync(Observable.of({prop1: 1}));
+    expect(state.prop1).to.equal(1);
+  });
+
+  it('notifies only last state to new observer', () => {
+    store.updateStateAsync(Observable.of({prop1: 1}));
+    store.updateStateAsync(Observable.of({prop1: 2}));
+    store.state$
+      .map(state => state)
+      .subscribe(state => console.log(state));
+    store.updateStateAsync(Observable.of({prop1: 1}));
+  });
 
 });
 
