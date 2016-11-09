@@ -1,3 +1,4 @@
+import {expect} from 'chai';
 import {Store, Updater, Operation, OperationResult} from './store';
 import {EventQueue, CoreEvent} from './event-queue';
 import {remove} from './util';
@@ -85,7 +86,7 @@ describe('Store', () => {
   describe('initial state', () => {
 
     it('is immutable', () => {
-      expect(() => state.prop1 = 24).toThrowError();
+      expect(() => state.prop1 = 24).to.throw();
     });
 
   });
@@ -94,7 +95,7 @@ describe('Store', () => {
     beforeEach(() => store.updateState({prop1: 24}));
 
     it('is immutable', () => {
-      expect(() => state.prop1 = 12).toThrowError();
+      expect(() => state.prop1 = 12).to.throw();
     });
 
   });
@@ -115,25 +116,25 @@ describe('Store', () => {
 
     it('does not send subsequent change notifications with same value', () => {
       store.updateState({});
-      expect(prop1History.length).toEqual(1);
+      expect(prop1History.length).to.equal(1);
     });
 
     it('does not send subsequent change notifications with same object', () => {
       store.updateState({prop1: 12});
-      expect(deepObjectHistory.length).toEqual(1);
+      expect(deepObjectHistory.length).to.equal(1);
     });
   });
 
   it('accepts updaters', () => {
     store.update(s => ({prop1: s.prop1 + 1}));
-    expect(state.prop1).toEqual(43);
+    expect(state.prop1).to.equal(43);
   });
 
   it('accepts event providers', () => {
     const event: Event = new Event();
     store.dispatch(s => event);
-    expect(sentEvents.length).toEqual(1);
-    expect(sentEvents[0]).toBe(event);
+    expect(sentEvents.length).to.equal(1);
+    expect(sentEvents[0]).to.equal(event);
   });
 
   it('accepts operations', () => {
@@ -142,9 +143,9 @@ describe('Store', () => {
       update: {prop1: s.prop1 + 2},
       event
     }));
-    expect(state.prop1).toEqual(44);
-    expect(sentEvents.length).toEqual(1);
-    expect(sentEvents[0]).toBe(event);
+    expect(state.prop1).to.equal(44);
+    expect(sentEvents.length).to.equal(1);
+    expect(sentEvents[0]).to.equal(event);
   });
 
   it('accepts operation results', () => {
@@ -153,9 +154,9 @@ describe('Store', () => {
       update: {prop1: 124},
       event
     });
-    expect(state.prop1).toEqual(124);
-    expect(sentEvents.length).toEqual(1);
-    expect(sentEvents[0]).toBe(event);
+    expect(state.prop1).to.equal(124);
+    expect(sentEvents.length).to.equal(1);
+    expect(sentEvents[0]).to.equal(event);
   });
 
   describe('when two successive updaters apply same diff', () => {
@@ -167,13 +168,13 @@ describe('Store', () => {
 
     it('the following updater receives a state', () => {
       store.update(s => {
-        expect(s).toBeDefined();
+        expect(s).to.exist;
         return s;
       });
     });
 
     it('stores updates from all updaters', () => {
-      expect(state.prop2).toBeDefined();
+      expect(state.prop2).to.exist;
     });
 
   });
@@ -181,13 +182,13 @@ describe('Store', () => {
   it('stores Date', () => {
     const now = new Date();
     store.updateState({dateProp: () => now});
-    expect(state.dateProp).toEqual(now);
+    expect(state.dateProp).to.equal(now);
   });
 
   it('removes from string array', () => {
     const two = '2';
     store.updateState({arrayProp: remove(two)});
-    expect(state.arrayProp).toEqual(['1', '3']);
+    expect(state.arrayProp).to.contain('1', '3');
   });
 
   describe('when updater returns previous state', () => {
@@ -196,7 +197,7 @@ describe('Store', () => {
     });
 
     it('does not create new state transition', () => {
-      expect(stateTransitions.length).toEqual(1);
+      expect(stateTransitions.length).to.equal(1);
     })
   })
 

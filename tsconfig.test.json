@@ -6,9 +6,8 @@
     "sourceMap": true,
     "noEmitHelpers": true
   },
-  "files": [
-    "src/index.ts",
-    "src/custom-typings.d.ts",
-    "typings/index.d.ts"
+  "exclude": [
+    "lib",
+    "node_modules"
   ]
 }

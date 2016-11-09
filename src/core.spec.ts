@@ -1,3 +1,4 @@
+import {expect} from 'chai';
 import {Core, CoreEventHandler} from './core';
 import {EventQueue, CoreEvent} from './event-queue';
 import {EventClass} from './event-class';
@@ -37,8 +38,8 @@ describe('Core', () => {
   it('accepts events', () => {
     const event: Event = new Event();
     core.dispatchEvent(event);
-    expect(sentEvents.length).toEqual(1);
-    expect(sentEvents[0]).toBe(event);
+    expect(sentEvents.length).to.equal(1);
+    expect(sentEvents[0]).to.equal(event);
   });
 
   describe('when listening for events', () => {
@@ -50,7 +51,7 @@ describe('Core', () => {
     });
 
     it('handles event', () => {
-      expect(caughtEvent).toBe(event);
+      expect(caughtEvent).to.equal(event);
     });
   });
 

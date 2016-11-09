@@ -1,3 +1,4 @@
+import {expect} from 'chai';
 import {EventQueue, CoreEvent} from './event-queue';
 
 class Event implements CoreEvent {
@@ -21,8 +22,8 @@ describe('EventBus', () => {
   it('dispatches single event', () => {
     const event = new Event();
     eventQueue.dispatch(event);
-    expect(dispatchedEvents.length).toEqual(1);
-    expect(dispatchedEvents[0]).toBe(event);
+    expect(dispatchedEvents.length).to.equal(1);
+    expect(dispatchedEvents[0]).to.equal(event);
   });
 
   it('dispatches multiple events', () => {
@@ -30,9 +31,9 @@ describe('EventBus', () => {
     const second = new Event();
     eventQueue.dispatch(first);
     eventQueue.dispatch(second);
-    expect(dispatchedEvents.length).toEqual(2);
-    expect(dispatchedEvents[0]).toBe(first);
-    expect(dispatchedEvents[1]).toBe(second);
+    expect(dispatchedEvents.length).to.equal(2);
+    expect(dispatchedEvents[0]).to.equal(first);
+    expect(dispatchedEvents[1]).to.equal(second);
   });
 
   it('dispatches event to every subscriber before dispatching another event', () => {
@@ -42,9 +43,9 @@ describe('EventBus', () => {
       if (event === first) eventQueue.dispatch(second);
     });
     eventQueue.dispatch(first);
-    expect(dispatchedEvents.length).toEqual(2);
-    expect(dispatchedEvents[0]).toBe(first);
-    expect(dispatchedEvents[1]).toBe(second);
+    expect(dispatchedEvents.length).to.equal(2);
+    expect(dispatchedEvents[0]).to.equal(first);
+    expect(dispatchedEvents[1]).to.equal(second);
   });
 
   describe('dispatched event', () => {
@@ -52,7 +53,7 @@ describe('EventBus', () => {
     beforeEach(() => eventQueue.dispatch(event));
 
     it('is immutable', () => {
-      expect(() => (<Event>dispatchedEvents[0]).val = 0).toThrowError();
+      expect(() => (<Event>dispatchedEvents[0]).val = 0).to.throw();
     });
   });
 
@@ -67,7 +68,7 @@ describe('EventBus', () => {
         .subscribe(event => filteredEvents.push(event));
       eventQueue.dispatch(new Event());
       eventQueue.dispatch(new OtherEvent());
-      expect(filteredEvents.length).toBe(1);
+      expect(filteredEvents.length).to.equal(1);
     });
 
     it('can filter Events which have parametrized constructor', () => {
