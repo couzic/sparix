@@ -81,11 +81,6 @@ export class Store<State extends Object> extends Core {
     this.update(state => diff);
   }
 
-  protected updateStateAsync(diff$: Observable<Object>) {
-    const updater: AsyncUpdater<State> = diff$.take(1).map(diff => (state: State) => diff);
-    this.update$.next(updater);
-  }
-
   protected dispatch(eventProvider: EventProvider<State>) {
     this.dispatchEvent(eventProvider(this.stateSubject$.getValue()));
   }
@@ -99,6 +94,23 @@ export class Store<State extends Object> extends Core {
   protected applyResult(operationResult: OperationResult<State>) {
     this.updateState(operationResult.update);
     this.dispatchEvent(operationResult.event);
+  }
+
+  protected updateStateMany(diff$: Observable<Object>) {
+    const updater: AsyncUpdater<State> = diff$.map(diff => (state: State) => diff);
+    this.update$.next(updater);
+  }
+
+  protected updateStateOnce(diff$: Observable<Object>) {
+    this.updateStateMany(diff$.take(1));
+  }
+
+  protected updateMany(updater$: AsyncUpdater<State>) {
+    this.update$.next(updater$);
+  }
+
+  protected updateOnce(updater$: AsyncUpdater<State>) {
+    this.updateMany(updater$.take(1));
   }
 
 }

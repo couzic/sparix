@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {Store, Updater, Operation, OperationResult} from './store';
+import {Store, Updater, Operation, OperationResult, AsyncUpdater} from './store';
 import {EventQueue, CoreEvent} from './event-queue';
 import {remove} from './util';
 import {Observable, Subject} from 'rxjs';
@@ -56,14 +56,26 @@ class TestStore extends Store<State> {
     super.applyResult(operationResult);
   }
 
-  updateStateAsync(diff$: Observable<Object>) {
-    super.updateStateAsync(diff$);
+  updateStateOnce(diff$: Observable<Object>) {
+    super.updateStateOnce(diff$);
+  }
+
+  updateStateMany(diff$: Observable<Object>) {
+    super.updateStateMany(diff$);
+  }
+
+  updateMany(updater$: AsyncUpdater<State>) {
+    super.updateMany(updater$);
+  }
+
+  updateOnce(updater$: AsyncUpdater<State>) {
+    super.updateOnce(updater$);
   }
 }
 
 describe('Store with no eventQueue', () => {
   it('can be instantiated', () => {
-    const store: TestStore = new TestStore()
+    new TestStore()
   })
 });
 
@@ -206,16 +218,39 @@ describe('Store', () => {
   });
 
   it('accepts Observable diff', () => {
-    store.updateStateAsync(Observable.of({prop1: 1}));
+    const diff$ = new Subject<Object>();
+    store.updateStateMany(diff$);
+    diff$.next({prop1: 1});
     expect(state.prop1).to.equal(1);
+    diff$.next({prop1: 2});
+    expect(state.prop1).to.equal(2);
   });
 
-  it('takes only first emitted diff of asyncDiff', () => {
+  it('takes only first emitted diff when updating once', () => {
     const diff$ = new Subject<Object>();
-    store.updateStateAsync(diff$);
+    store.updateStateOnce(diff$);
     diff$.next({prop1: 1});
     diff$.next({prop1: 2});
     expect(state.prop1).to.equal(1);
+  });
+
+  it('accepts Observable updater', () => {
+    const updater$ = new Subject<Updater<State>>();
+    store.updateMany(updater$);
+    const updater: Updater<State> = state => ({prop1: state.prop1 + 1});
+    updater$.next(updater);
+    expect(state.prop1).to.equal(43);
+    updater$.next(updater);
+    expect(state.prop1).to.equal(44);
+  });
+
+  it('executes only first updater when updating once', () => {
+    const updater$ = new Subject<Updater<State>>();
+    store.updateOnce(updater$);
+    const updater: Updater<State> = state => ({prop1: state.prop1 + 1});
+    updater$.next(updater);
+    updater$.next(updater);
+    expect(state.prop1).to.equal(43);
   });
 
 });
