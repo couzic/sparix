@@ -19,7 +19,7 @@ export interface Updater<State> {
   (state: State): Object;
 }
 
-export type AsyncUpdater<State> = Observable<Updater<State>>
+export type FutureUpdater<State> = Observable<Updater<State>>
 
 export interface EventProvider<State> {
   (state: State): CoreEvent;
@@ -36,7 +36,7 @@ export interface Operation<State> {
 
 export class Store<State extends Object> extends Core {
 
-  private update$ = new Subject<AsyncUpdater<State>>();
+  private update$ = new Subject<FutureUpdater<State>>();
   private stateSubject$: BehaviorSubject<State>;
 
   constructor(private initialState: State, eventQueue?: EventQueue) {
@@ -97,7 +97,7 @@ export class Store<State extends Object> extends Core {
   }
 
   protected updateStateMany(diff$: Observable<Object>) {
-    const updater: AsyncUpdater<State> = diff$.map(diff => (state: State) => diff);
+    const updater: FutureUpdater<State> = diff$.map(diff => (state: State) => diff);
     this.update$.next(updater);
   }
 
@@ -105,11 +105,11 @@ export class Store<State extends Object> extends Core {
     this.updateStateMany(diff$.take(1));
   }
 
-  protected updateMany(updater$: AsyncUpdater<State>) {
+  protected updateMany(updater$: FutureUpdater<State>) {
     this.update$.next(updater$);
   }
 
-  protected updateOnce(updater$: AsyncUpdater<State>) {
+  protected updateOnce(updater$: FutureUpdater<State>) {
     this.updateMany(updater$.take(1));
   }
 

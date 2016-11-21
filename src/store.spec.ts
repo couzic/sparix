@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {Store, Updater, Operation, OperationResult, AsyncUpdater} from './store';
+import {Store, Updater, Operation, OperationResult, FutureUpdater} from './store';
 import {EventQueue, CoreEvent} from './event-queue';
 import {remove} from './util';
 import {Observable, Subject} from 'rxjs';
@@ -64,11 +64,11 @@ class TestStore extends Store<State> {
     super.updateStateMany(diff$);
   }
 
-  updateMany(updater$: AsyncUpdater<State>) {
+  updateMany(updater$: FutureUpdater<State>) {
     super.updateMany(updater$);
   }
 
-  updateOnce(updater$: AsyncUpdater<State>) {
+  updateOnce(updater$: FutureUpdater<State>) {
     super.updateOnce(updater$);
   }
 }
