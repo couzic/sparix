@@ -1,12 +1,10 @@
 # sparix
 
-## DISCLAIMER: Serious WIP !!!
-
 #### Single Page Application state management powered by RxJS
 ###### Inspired by Flux, Redux, Hexagonal Architecture and more..
 
 ### Introduction
-This project aims to alleviate the pain in SPA development by providing a set of opiniated tools and patterns to model the application core's state, in a simple, easily testable and immutable way. In the sparix world, the state is encapsulated in Stores, which are responsible for updating the state. This state is made publically available as an Observable, or in other words as a succession of state transitions. Several stores can communicate between themselves by dispatching global events.
+This project aims to alleviate the pain in SPA development by providing a set of opiniated tools and patterns to model the application core's state, in a simple, easily testable and immutable way. In the sparix world, the state is encapsulated in Stores, which are responsible for updating the state. This state is made publically available as an Observable, or in other words as a succession of state transitions.
 
 ### Quickstart
 
@@ -17,7 +15,8 @@ $ npm i -S sparix rxjs
 
 #### Create a Store
 ```ts
-import {Store, EventQueue} from 'sparix'
+import {Store} from 'sparix'
+import {add} from 'ramda'
 
 export interface CounterState {
     count: number
@@ -28,12 +27,15 @@ const initialState: CounterState = {
 }
 
 export class Counter extends Store<CounterState> {
-    constructor(eventQueue: EventQueue) {
-        super(eventQueue, initialState)
+    constructor() {
+        super(initialState)
     }
     
     increment() {
+        // ALL THESE ARE EQUIVALENT
+        this.update(state => {count: state.count + 1})
         this.updateState({count: val => val + 1})
+        this.updateState({count: add(1)})
     }
 }
 ```
@@ -51,43 +53,6 @@ const count$: Observable<number> = counter.map(state => state.count)
 expect(counter.currentState.count).toEqual(0)
 counter.increment()
 expect(counter.currentState.count).toEqual(1)
-```
-
-#### Dispatch an Event
-```ts
-export class CountIncremented {
-    constructor(public newCount: number) {}
-}
-
-export class Counter extends Store<CounterState> {
-    // constructor
-    
-    increment() {
-        this.updateState({count: val => val + 1})
-        this.dispatch(state => new CountIncremented(state.count))
-    }
-}
-```
-
-#### Handle an Event
-```ts
-import {Store, EventQueue} from 'sparix'
-import {CountIncremented} from './counter'
-
-export interface EvenCountState {
-    isEven: boolean
-}
-
-const initialState: EvenCountState = {
-    isEven: true
-}
-
-export class EventCountStore extends Store<EvenCountState> {
-    constructor(eventQueue: EventQueue) {
-        super(eventQueue, initialState)
-        this.on(CountIncremented, event => this.updateState({isEven: event.newCount % 2 === 0}) 
-    }
-}
 ```
 
 ### What is sparix ?
@@ -156,30 +121,7 @@ So what do you put in the core ? The answer is quite simple: **everything else**
 So back to sparix. It will help you model an application core that does not depend on third-party libraries and frameworks, with two exceptions being RxJS and sparix itself. But that's not much of a problem. Observables are on their way of becoming a standard ECMAScript feature, and sparix is a non-intrusive library, which makes it easy to model only a subset of your application core with it.
 
 ### Immutablility
-In sparix, the state is modeled as an `Observable<State>`, an immutable stream of immutable states. There can be no side effects. It's as simple as that.
+In sparix, the state is modeled as an `Observable<State>`, an immutable stream of states.
 
 ### Testability
-Sparix introduces the concept of Diamond Architecture. Stores have two kinds of inputs:
-* Public methods
-* Events
-
-And two kinds of outputs:
-* The stream of states
-* Events
-
-A Store's API is kept simple, and all the complex logic is encapsulated and hidden from the outside, just like you would do with good old Object Oriented  Programming. To test a Store, all you need to do is simulate an input (either by calling its public methods or dispatching an event), and check the output (state or events).
-
-## Concepts
-
-### Store
-
-Each Store represents a cohesive functional subset of your application's core.
-
-Behavior = Core
-
-Stateful core = Store
-
-### Event
-Event though most of the time you just want to update the state of a single Store, sometimes you want to dispatch an app-wide event that **any** store could decide it is interested in. Or sometimes you know that only a single store will ever listen to a specific event, but you might still decide to use events just to decouple Stores from each other (and I suggest you do !).
-
-An event is dispatched to all registered Stores before the next event in the queue gets dispatched.
+A Store's API is kept simple, and all the complex logic is encapsulated and hidden from the outside, just like you would do with good old Object Oriented Programming. To test a Store, all you need to do is simulate an input (by calling one of its public methods) and check its output (the state).
