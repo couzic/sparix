@@ -1,16 +1,17 @@
 # sparix
 
 #### Single Page Application state management powered by RxJS
-###### Inspired by Flux, Redux, Hexagonal Architecture and more..
 
 ### Introduction
-This project aims to alleviate the pain in SPA development by providing a set of opiniated tools and patterns to model the application core's state, in a simple, easily testable and immutable way. In the sparix world, the state is encapsulated in Stores, which are responsible for updating the state. This state is made publically available as an Observable, or in other words as a succession of state transitions.
+This project aims to alleviate the pain in SPA development by implementing an opiniated pattern for modeling an application's state in a framework-agnostic, easy-to-test and developer-friendly way. In the sparix world, the state is encapsulated in Stores, which are responsible for updating the state. An update does not mutate the state, instead it creates a new transformed instance of the state (just like a redux reducer). The transformed states sequence are made publically available as a RxJS Observable.
+
+Sparix is written in TypeScript, and so are the code samples. It is distributed as a JavaScript library with type definitions, just like RxJS.
 
 ### Quickstart
 
 #### Install
 ```sh
-$ npm i -S sparix rxjs
+$ npm i -S sparix rxjs immupdate
 ```
 
 #### Create a Store
@@ -35,18 +36,19 @@ export class Counter extends Store<CounterState> {
         // ALL THESE ARE EQUIVALENT
         this.update(state => {count: state.count + 1})
         this.updateState({count: val => val + 1})
-        this.updateState({count: add(1)})
+        this.updateState({count: add(1)}) // Using Ramda's automatically curryied functions
     }
 }
 ```
 
 #### Consume the Store's state
 ```ts
-import {Counter} from './counter'
+import {Counter, CounterState} from './counter'
 
-const counter: Counter = ... // Get counter instance from exported module or dependency injection
+const counter = new Counter()
 
 // Recommended way
+const state$: Observable<CounterState> = counter.state$
 const count$: Observable<number> = counter.map(state => state.count)
 
 // Alternative way (useful for testing)
@@ -56,9 +58,17 @@ expect(counter.currentState.count).toEqual(1)
 ```
 
 ### What is sparix ?
-First, it's a pattern (or set of patterns). Second, it's an implementation based on RxJS. The implementation is quite trivial, and it would only take a few hours to migrate it to another reactive library. However, since the SPA world will soon be dominated by two giants, React and Angular2, and since the latter ships with RxJS, it made sense to use this library for the reference implementation of sparix.
+First, it's a pattern. Second, it's an implementation based on RxJS. The implementation is quite trivial, and it would only take a couple hours to rewrite it with another reactive library. However, since the SPA world is to be dominated by React and Angular2, and since the latter ships with RxJS, it made sense to use this library for the reference implementation of sparix.
+
+### Immutablility
+In sparix, the state is modeled as an `Observable<State>`, an immutable stream of state transitions.
+
+### Testability
+A Store's API is kept simple, and all the complex logic is encapsulated and hidden from the outside, just like you would do with good old Object Oriented Programming. To test a Store, all you need to do is simulate an input (by calling one of its public methods) and check its output (the state).
 
 ### How it compares to redux
+Sparix completely adheres to the redux principle (or rather, the Elm Architecture principle) where state transformations are defined as pure functions which do not mutate the previous state.
+
 In redux, when you need to update the state, you dispatch an action. But if you look closely, you might realize that actions can be sorted in two categories :
 * Actions that target a single reducer, to update a single subset of the state tree. Their names are usually in imperative form (*ADD_TODO*, *INCREMENT_COUNTER*...). I call them **Updaters**.
 * Actions that target one or many reducers, to notify the system that something happened. Their names are usually in declarative form (*TODO_SAVED*, *TODO_SAVE_FAILED*...). I call them **Events**.
@@ -94,7 +104,7 @@ this.updateState({
 ```
 I like to think of these state updaters as anonymous actions. In redux, it would be like dispatching a reducer. But what about action creators ? Well, we don't need them really: 
 ```ts
-const increment = R.add(1)
+const increment = val => val + 1
 
 class SomeStore extends Store<SomeState> {
     // constructor
@@ -119,9 +129,3 @@ The application core doesn't know about HTML, the DOM, Angular or React, Local S
 So what do you put in the core ? The answer is quite simple: **everything else** ! If it can be part of the core, it should be part of the core. All the business logic, the data transformations, the interaction logic, should be modeled as the application core. And **none of that** should depend on anything else than the programming language which was used to model it.
 
 So back to sparix. It will help you model an application core that does not depend on third-party libraries and frameworks, with two exceptions being RxJS and sparix itself. But that's not much of a problem. Observables are on their way of becoming a standard ECMAScript feature, and sparix is a non-intrusive library, which makes it easy to model only a subset of your application core with it.
-
-### Immutablility
-In sparix, the state is modeled as an `Observable<State>`, an immutable stream of states.
-
-### Testability
-A Store's API is kept simple, and all the complex logic is encapsulated and hidden from the outside, just like you would do with good old Object Oriented Programming. To test a Store, all you need to do is simulate an input (by calling one of its public methods) and check its output (the state).
