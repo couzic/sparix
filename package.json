@@ -10,7 +10,7 @@
     "prepublish": "npm test && npm run build",
     "prebuild": "shx rm -rf ./lib",
     "build": "tsc --project tsconfig.build.json",
-    "test": "mocha --opts mocha.opts && rm -rf test",
+    "test": "mocha --opts mocha.opts && shx rm -rf test",
     "tdd": "mocha --opts mocha.opts --watch"
   },
   "repository": {
