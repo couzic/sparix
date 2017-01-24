@@ -2,11 +2,9 @@ config
 coverage
 node_modules
 src
-typings
 .editorconfig
 .gitignore
 .npmignore
-.typingsrc
 karma.conf.js
 LICENCE.txt
 npm-debug.log
@@ -14,7 +12,6 @@ tsconfig.build.json
 tsconfig.json
 tsconfig.test.json
 tslint.json
-typings.json
 
 # IDE #
 .idea
