@@ -1,6 +1,12 @@
 {
   "compileOnSave": false,
   "buildOnSave": false,
+  "compilerOptions": {
+    "target": "es5",
+    "noEmit": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
   "atom": {
     "rewriteTsconfig": false
   }

@@ -16,7 +16,7 @@ export interface Mapper<State, R> {
 }
 
 export interface Updater<State> {
-  (state: State): Object;
+  (state: State): any;
 }
 
 export type FutureUpdater<State> = Observable<Updater<State>>
@@ -33,6 +33,15 @@ export class OperationResult<State> {
 export interface Operation<State> {
   (state: State): OperationResult<State>;
 }
+
+interface Differ<V> {
+  (val: V): V
+}
+
+type Diff<T, K extends keyof T> = {
+  [P in K]: T[P] | Differ<T[P]>;
+  }
+
 
 export class Store<State extends Object> extends Core {
 
@@ -77,7 +86,7 @@ export class Store<State extends Object> extends Core {
     this.update$.next(Observable.of(updater));
   }
 
-  protected updateState(diff: Object) {
+  protected updateState<K extends keyof State>(diff: Diff<State, K>) {
     this.update(state => diff);
   }
 

@@ -5,7 +5,9 @@
     "target": "es5",
     "outDir": "lib",
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
   },
   "files": [
     "src/index.ts",

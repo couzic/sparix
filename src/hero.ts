@@ -26,7 +26,7 @@ const initialState: HeroState = {
   power: 1
 };
 
-const incrementAttackCount = state => ({attackCount: state.attackCount + 1});
+const incrementAttackCount = (state: HeroState) => ({attackCount: state.attackCount + 1});
 
 export class Hero extends Store<HeroState> {
 

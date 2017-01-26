@@ -4,7 +4,9 @@
     "moduleResolution": "node",
     "target": "es5",
     "sourceMap": true,
-    "noEmitHelpers": true
+    "noEmitHelpers": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
   },
   "exclude": [
     "lib",
