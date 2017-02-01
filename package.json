@@ -1,6 +1,6 @@
 {
   "name": "sparix",
-  "version": "0.0.7-alpha.22",
+  "version": "0.0.7-alpha.23",
   "description": "Single Page Application state management powered by RxJS",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -8,7 +8,7 @@
     "start": "npm run tdd",
     "prepublish": "npm test && npm run build",
     "prebuild": "shx rm -rf ./lib",
-    "build": "tsc --project tsconfig.build.json",
+    "build": "tsc",
     "test": "mocha --opts mocha.opts && shx rm -rf test",
     "tdd": "mocha --opts mocha.opts --watch"
   },

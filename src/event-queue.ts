@@ -17,7 +17,7 @@ export class EventQueue implements Observer<CoreEvent> {
   private queuedEvents: CoreEvent[] = [];
 
   constructor() {
-    this.output$ = Observable.create(subscriber => {
+    this.output$ = Observable.create((subscriber: Subscriber<CoreEvent>) => {
       this.subscribers.push(subscriber);
     });
   }

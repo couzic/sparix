@@ -1,7 +1,6 @@
 import {expect} from 'chai';
-import {Store, Updater, Operation, OperationResult, FutureUpdater} from './store';
+import {Store, DiffProvider, Operation, OperationResult, FutureUpdater, Diff} from './store';
 import {EventQueue, CoreEvent} from './event-queue';
-import {remove} from './util';
 import {Observable, Subject} from 'rxjs';
 
 class State {
@@ -36,11 +35,11 @@ class TestStore extends Store<State> {
     super(initialState, eventQueue);
   }
 
-  updateState(diff: any) {
+  updateState(diff: Diff<State>) {
     super.updateState(diff);
   }
 
-  update(updater: Updater<State>) {
+  update(updater: DiffProvider<State>) {
     super.update(updater);
   }
 
@@ -117,8 +116,11 @@ describe('Store', () => {
   });
 
   describe('.map()', () => {
-    let prop1History;
-    let deepObjectHistory;
+    let prop1History: number[];
+    let deepObjectHistory: Array<{
+      subProp1: number;
+      subProp2: string;
+    }>;
     beforeEach(() => {
       prop1History = [];
       deepObjectHistory = [];
@@ -201,12 +203,6 @@ describe('Store', () => {
     expect(state.dateProp).to.equal(now);
   });
 
-  it('removes from string array', () => {
-    const two = '2';
-    store.updateState({arrayProp: remove(two)});
-    expect(state.arrayProp).to.contain('1', '3');
-  });
-
   describe('when updater returns previous state', () => {
     beforeEach(() => {
       store.update(state => state);
@@ -235,9 +231,9 @@ describe('Store', () => {
   });
 
   it('accepts Observable updater', () => {
-    const updater$ = new Subject<Updater<State>>();
+    const updater$ = new Subject<DiffProvider<State>>();
     store.updateMany(updater$);
-    const updater: Updater<State> = state => ({prop1: state.prop1 + 1});
+    const updater: DiffProvider<State> = state => ({prop1: state.prop1 + 1});
     updater$.next(updater);
     expect(state.prop1).to.equal(43);
     updater$.next(updater);
@@ -245,9 +241,9 @@ describe('Store', () => {
   });
 
   it('executes only first updater when updating once', () => {
-    const updater$ = new Subject<Updater<State>>();
+    const updater$ = new Subject<DiffProvider<State>>();
     store.updateOnce(updater$);
-    const updater: Updater<State> = state => ({prop1: state.prop1 + 1});
+    const updater: DiffProvider<State> = state => ({prop1: state.prop1 + 1});
     updater$.next(updater);
     updater$.next(updater);
     expect(state.prop1).to.equal(43);

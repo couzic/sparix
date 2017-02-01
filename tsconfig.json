@@ -1,13 +1,16 @@
 {
-  "compileOnSave": false,
-  "buildOnSave": false,
+  "extends": "./tsconfig.ide",
   "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
     "target": "es5",
-    "noEmit": true,
+    "outDir": "lib",
+    "declaration": true,
+    "sourceMap": true,
     "noImplicitAny": true,
-    "strictNullChecks": true
+    "strictNullChecks": false
   },
-  "atom": {
-    "rewriteTsconfig": false
-  }
+  "files": [
+    "src/index.ts"
+  ]
 }

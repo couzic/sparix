@@ -15,18 +15,18 @@ export interface Mapper<State, R> {
   (state: State): R;
 }
 
-export interface Updater<State> {
-  (state: State): any;
+export interface DiffProvider<State> {
+  (state: State): Diff<State>;
 }
 
-export type FutureUpdater<State> = Observable<Updater<State>>
+export type FutureUpdater<State> = Observable<DiffProvider<State>>
 
 export interface EventProvider<State> {
   (state: State): CoreEvent;
 }
 
 export class OperationResult<State> {
-  public update: Object;
+  public update: Diff<State>;
   public event: CoreEvent;
 }
 
@@ -34,12 +34,12 @@ export interface Operation<State> {
   (state: State): OperationResult<State>;
 }
 
-interface Differ<V> {
+export interface ValueUpdater<V> {
   (val: V): V
 }
 
-type Diff<T, K extends keyof T> = {
-  [P in K]: T[P] | Differ<T[P]>;
+export type Diff<T> = {
+  [P in keyof T]?: T[P] | ValueUpdater<T[P]> | Diff<T[P]>;
   }
 
 
@@ -51,7 +51,7 @@ export class Store<State extends Object> extends Core {
   constructor(private initialState: State, eventQueue?: EventQueue) {
     super(eventQueue);
 
-    const stateReducer = (previousState: State, operation: Updater<State>) => {
+    const stateReducer = (previousState: State, operation: DiffProvider<State>) => {
       const diff = operation(previousState);
       if (diff === previousState) return previousState;
       else return immupdate(previousState, diff);
@@ -78,15 +78,19 @@ export class Store<State extends Object> extends Core {
     return this.state$.map(project).distinctUntilChanged();
   }
 
+  mapToProp<K extends keyof State>(key: K): Observable<State[K]> {
+    return this.map(state => state[key]);
+  }
+
   filter(predicate: Mapper<State, boolean>): Observable<State> {
     return this.state$.filter(predicate).distinctUntilChanged();
   }
 
-  protected update(updater: Updater<State>) {
+  protected update(updater: DiffProvider<State>) {
     this.update$.next(Observable.of(updater));
   }
 
-  protected updateState<K extends keyof State>(diff: Diff<State, K>) {
+  protected updateState(diff: Diff<State>) {
     this.update(state => diff);
   }
 
@@ -105,12 +109,12 @@ export class Store<State extends Object> extends Core {
     this.dispatchEvent(operationResult.event);
   }
 
-  protected updateStateMany(diff$: Observable<Object>) {
+  protected updateStateMany(diff$: Observable<Diff<State>>) {
     const updater: FutureUpdater<State> = diff$.map(diff => (state: State) => diff);
     this.update$.next(updater);
   }
 
-  protected updateStateOnce(diff$: Observable<Object>) {
+  protected updateStateOnce(diff$: Observable<Diff<State>>) {
     this.updateStateMany(diff$.take(1));
   }
 

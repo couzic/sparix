@@ -1,7 +1,7 @@
-export function freeze<T extends Object>(o: T): T {
+export function freeze(o: any) {
   Object.freeze(o);
 
-  Object.getOwnPropertyNames(o).forEach(function (prop) {
+  Object.getOwnPropertyNames(o).forEach((prop: string) => {
     if (o.hasOwnProperty(prop)
       && o[prop]
       && (typeof o[prop] === 'object' || typeof o[prop] === 'function')
