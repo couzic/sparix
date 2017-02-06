@@ -78,7 +78,7 @@ export class Store<State extends Object> extends Core {
     return this.state$.map(project).distinctUntilChanged();
   }
 
-  mapToProp<K extends keyof State>(key: K): Observable<State[K]> {
+  select<K extends keyof State>(key: K): Observable<State[K]> {
     return this.map(state => state[key]);
   }
 
