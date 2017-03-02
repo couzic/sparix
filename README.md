@@ -1,17 +1,18 @@
 # sparix
 
-#### Single Page Application state management powered by RxJS
+#### Type-safe Single Page Application state management powered by RxJS
 
 ### Introduction
-This project aims to alleviate the pain in SPA development by implementing an opiniated pattern for modeling an application's state in a framework-agnostic, easy-to-test and developer-friendly way. In the sparix world, the state is encapsulated in Stores, which are responsible for updating the state. An update does not mutate the state, instead it creates a new transformed instance of the state (just like a redux reducer). The transformed states sequence are made publically available as a RxJS Observable.
+This project aims to alleviate the pain in SPA development by implementing an opiniated pattern for modeling an application's state in a framework-agnostic, easy-to-test and developer-friendly way.
+Sparix allows you to encapsulate state in type-safe Stores, and define the transformations that can occur on said state. An update can never mutate the state, instead it creates a new transformed instance of the state (just like a redux reducer). The transformed states sequence are made publically available as a RxJS `Observable<State>`.
 
-Sparix is written in TypeScript, and so are the code samples. It is distributed as a JavaScript library with type definitions, just like RxJS.
+Sparix is written in TypeScript, and so are the code samples. It is distributed as a JavaScript library with type definitions embedded in the NPM module, just like RxJS.
 
 ### Quickstart
 
 #### Install
 ```sh
-$ npm i -S sparix rxjs immupdate
+$ npm i -S sparix rxjs
 ```
 
 #### Create a Store
@@ -70,8 +71,8 @@ A Store's API is kept simple, and all the complex logic is encapsulated and hidd
 Sparix completely adheres to the redux principle (or rather, the Elm Architecture principle) where state transformations are defined as pure functions which do not mutate the previous state.
 
 In redux, when you need to update the state, you dispatch an action. But if you look closely, you might realize that actions can be sorted in two categories :
-* Actions that target a single reducer, to update a single subset of the state tree. Their names are usually in imperative form (*ADD_TODO*, *INCREMENT_COUNTER*...). I call them **Updaters**.
-* Actions that target one or many reducers, to notify the system that something happened. Their names are usually in declarative form (*TODO_SAVED*, *TODO_SAVE_FAILED*...). I call them **Events**.
+* Actions that represent commands. They target a single reducer, to update a single subset of the state tree. Their names are usually in imperative form (*ADD_TODO*, *INCREMENT_COUNTER*...). I'll refer to them as **Updaters**.
+* Actions that represent events. They target one or many reducers, to notify the system that something happened. Their names are usually in declarative form (*TODO_SAVED*, *TODO_SAVE_FAILED*...). I refer to them as **Events**.
  
 My claim is that actions are too heavy a mechanism when the goal is simply to update a single Store's state (as in most cases). In sparix, a Store can directly update its state with no more ceremony than:
 ```ts
