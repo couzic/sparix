@@ -1,16 +1,14 @@
-config
-coverage
-node_modules
-src
+/node_modules
+/src
 .editorconfig
 .gitignore
 .npmignore
-karma.conf.js
 LICENCE.txt
+mocha.opts
 npm-debug.log
 tsconfig.build.json
+tsconfig.ide.json
 tsconfig.json
-tsconfig.test.json
 tslint.json
 
 # IDE #
