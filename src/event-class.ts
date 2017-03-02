@@ -1,5 +1,5 @@
-import {CoreEvent} from './event-queue';
+import {CoreEvent} from './event-queue'
 
 export interface EventClass<Event extends CoreEvent> {
-  new (...args: any[]): Event;
+   new (...args: any[]): Event
 }

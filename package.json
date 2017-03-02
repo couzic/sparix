@@ -1,9 +1,9 @@
 {
   "name": "sparix",
-  "version": "0.0.7-alpha.24",
+  "version": "1.0.0-beta.1",
   "description": "Single Page Application state management powered by RxJS",
   "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "types": "lib/index.d.ts",
   "scripts": {
     "start": "npm run tdd",
     "prepublish": "npm test && npm run build",
@@ -22,23 +22,23 @@
     "url": "https://github.com/micouz"
   },
   "license": "MIT",
-  "dependencies": {},
-  "peerDependencies": {
-    "rxjs": "^5.0.3",
+  "dependencies": {
     "immupdate": "0.4.0"
   },
+  "peerDependencies": {
+    "rxjs": "^5.0.0"
+  },
   "devDependencies": {
-    "@types/chai": "^3.4.34",
+    "@types/chai": "^3.4.35",
     "@types/core-js": "^0.9.35",
-    "@types/mocha": "^2.2.38",
+    "@types/mocha": "^2.2.39",
     "chai": "^3.5.0",
     "core-js": "^2.4.0",
-    "immupdate": "0.4.0",
-    "mocha": "^3.1.2",
-    "rxjs": "^5.0.3",
-    "shx": "^0.1.2",
-    "ts-loader": "^0.8.2",
-    "ts-node": "^1.6.0",
-    "typescript": "^2.1.5"
+    "mocha": "^3.2.0",
+    "rxjs": "^5.2.0",
+    "shx": "^0.2.2",
+    "ts-loader": "^2.0.1",
+    "ts-node": "^2.1.0",
+    "typescript": "^2.2.1"
   }
 }

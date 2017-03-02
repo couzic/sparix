@@ -8,7 +8,7 @@
     "declaration": true,
     "sourceMap": true,
     "noImplicitAny": true,
-    "strictNullChecks": false
+    "strictNullChecks": false // Make true
   },
   "files": [
     "src/index.ts"

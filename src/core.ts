@@ -1,38 +1,38 @@
-import 'rxjs/add/operator/distinctUntilChanged';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/scan';
-import 'rxjs/add/operator/share';
-import {CoreEvent, EventQueue} from './event-queue';
-import {EventClass} from './event-class';
+import 'rxjs/add/operator/distinctUntilChanged'
+import 'rxjs/add/operator/filter'
+import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/scan'
+import 'rxjs/add/operator/share'
+import {CoreEvent, EventQueue} from './event-queue'
+import {EventClass} from './event-class'
 
 export interface CoreEventHandler<Event extends CoreEvent> {
-  (event: Event): void;
+   (event: Event): void
 }
 
 export class Core {
 
-  private eventHandlers = new Map<EventClass<any>, CoreEventHandler<any>>();
+   private eventHandlers = new Map<EventClass<any>, CoreEventHandler<any>>()
 
-  constructor(private eventQueue?: EventQueue) {
-    if (eventQueue) {
-      eventQueue.event$.subscribe(event => this.handleEvent(event));
-    }
-  }
+   constructor(private eventQueue?: EventQueue) {
+      if (eventQueue) {
+         eventQueue.event$.subscribe(event => this.handleEvent(event))
+      }
+   }
 
-  protected dispatchEvent(event: CoreEvent) {
-    this.eventQueue.dispatch(event);
-  }
+   protected dispatchEvent(event: CoreEvent) {
+      this.eventQueue.dispatch(event)
+   }
 
-  protected on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: EventClass<Event>,
-                                                                                 handler: Handler) {
-    this.eventHandlers.set(eventClass, handler);
-  }
+   protected on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: EventClass<Event>,
+                                                                                  handler: Handler) {
+      this.eventHandlers.set(eventClass, handler)
+   }
 
-  private handleEvent<Event extends CoreEvent>(event: Event): void {
-    const handler: CoreEventHandler<Event> = this.eventHandlers.get(<EventClass<Event>> event.constructor);
-    if (handler) {
-      handler(event);
-    }
-  }
+   private handleEvent<Event extends CoreEvent>(event: Event): void {
+      const handler: CoreEventHandler<Event> = this.eventHandlers.get(<EventClass<Event>> event.constructor)
+      if (handler) {
+         handler(event)
+      }
+   }
 }

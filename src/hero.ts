@@ -1,46 +1,46 @@
-import {Store} from './store';
-import {EventQueue, CoreEvent} from './event-queue';
-import {MonsterDied} from './monster';
+import {Store} from './store'
+import {EventQueue, CoreEvent} from './event-queue'
+import {MonsterDied} from './monster'
 
 export class HeroState {
 
-  public level: number;
-  public attackCount: number;
-  public power: number;
+   public level: number
+   public attackCount: number
+   public power: number
 
 }
 
 export class HeroAttacked implements CoreEvent {
-  constructor(public damage: number) {
-  }
+   constructor(public damage: number) {
+   }
 }
 
 export class HeroGainedLevel implements CoreEvent {
-  constructor(public newLevel: number) {
-  }
+   constructor(public newLevel: number) {
+   }
 }
 
 const initialState: HeroState = {
-  level: 1,
-  attackCount: 0,
-  power: 1
-};
+   level: 1,
+   attackCount: 0,
+   power: 1
+}
 
-const incrementAttackCount = (state: HeroState) => ({attackCount: state.attackCount + 1});
+const incrementAttackCount = (state: HeroState) => ({attackCount: state.attackCount + 1})
 
 export class Hero extends Store<HeroState> {
 
-  constructor(eventQueue: EventQueue) {
-    super(initialState, eventQueue);
-    this.on(MonsterDied, () => {
-      this.update(s => ({level: s.level + 1}));
-      this.dispatch(s => new HeroGainedLevel(s.level));
-    });
-  }
+   constructor(eventQueue: EventQueue) {
+      super(initialState, eventQueue)
+      this.on(MonsterDied, () => {
+         this.update(s => ({level: s.level + 1}))
+         this.dispatch(s => new HeroGainedLevel(s.level))
+      })
+   }
 
-  attack() {
-    this.update(incrementAttackCount);
-    this.dispatch(state => new HeroAttacked(state.power));
-  }
+   attack() {
+      this.update(incrementAttackCount)
+      this.dispatch(state => new HeroAttacked(state.power))
+   }
 
 }
