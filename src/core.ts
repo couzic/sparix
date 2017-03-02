@@ -21,7 +21,7 @@ export class Core {
    }
 
    protected dispatchEvent(event: CoreEvent) {
-      this.eventQueue.dispatch(event)
+      this.eventQueue && this.eventQueue.dispatch(event)
    }
 
    protected on<Event extends CoreEvent, Handler extends CoreEventHandler<Event>>(eventClass: EventClass<Event>,

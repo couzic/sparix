@@ -14,12 +14,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:micouz/sparix.git"
+    "url": "git@github.com:couzic/sparix.git"
   },
   "author": {
     "name": "Mikael Couzic",
     "email": "mikaelcouzic@gmail.com",
-    "url": "https://github.com/micouz"
+    "url": "https://github.com/couzic"
   },
   "license": "MIT",
   "dependencies": {

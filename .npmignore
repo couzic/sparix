@@ -6,7 +6,6 @@
 LICENCE.txt
 mocha.opts
 npm-debug.log
-tsconfig.build.json
 tsconfig.ide.json
 tsconfig.json
 tslint.json

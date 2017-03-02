@@ -46,9 +46,8 @@ export class EventQueue implements Observer<CoreEvent> {
             subscriber.next(event)
          })
          this.dispatching = false
-         if (this.queuedEvents.length > 0) {
-            this.dispatch(this.queuedEvents.pop())
-         }
+         const popped = this.queuedEvents.pop()
+         popped && this.dispatch(popped)
       }
    }
 
