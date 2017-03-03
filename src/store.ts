@@ -1,16 +1,16 @@
-import 'rxjs/add/operator/distinctUntilChanged'
-import 'rxjs/add/operator/filter'
-import 'rxjs/add/operator/map'
-import 'rxjs/add/operator/scan'
-import 'rxjs/add/operator/share'
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/scan';
+import 'rxjs/add/operator/share';
 import 'rxjs/add/operator/mergeAll';
-import {Subject} from 'rxjs/Subject'
-import {Observable} from 'rxjs/Observable'
-import {BehaviorSubject} from 'rxjs/BehaviorSubject'
-import {CoreEvent, EventQueue} from './event-queue'
-import {freeze} from './freeze'
-import {Core} from './core'
-import {update} from './update'
+import {Subject} from 'rxjs/Subject';
+import {Observable} from 'rxjs/Observable';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {CoreEvent, EventQueue} from './event-queue';
+import {freeze} from './freeze';
+import {Core} from './core';
+import {updateValue} from './update';
 
 export interface Mapper<State, R> {
    (state: State): R
@@ -58,7 +58,7 @@ export class Store<State extends Object> extends Core {
       const stateReducer = (previousState: State, operation: DiffProvider<State>) => {
          const diff = operation(previousState)
          if (diff === previousState) return previousState
-         else return update(previousState, diff)
+         else return updateValue(previousState, diff)
       }
 
       this.stateSubject$ = new BehaviorSubject<State>(freeze(initialState))
