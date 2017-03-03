@@ -10,7 +10,7 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {CoreEvent, EventQueue} from './event-queue';
 import {freeze} from './freeze';
 import {Core} from './core';
-import {updateValue} from './update';
+import {update} from './update';
 
 export interface Mapper<State, R> {
    (state: State): R
@@ -58,7 +58,7 @@ export class Store<State extends Object> extends Core {
       const stateReducer = (previousState: State, operation: DiffProvider<State>) => {
          const diff = operation(previousState)
          if (diff === previousState) return previousState
-         else return updateValue(previousState, diff)
+         else return update(previousState, diff)
       }
 
       this.stateSubject$ = new BehaviorSubject<State>(freeze(initialState))

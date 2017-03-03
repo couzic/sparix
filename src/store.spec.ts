@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {Store, DiffProvider, Operation, OperationResult, FutureUpdater, PartialDiff} from './store';
 import {EventQueue, CoreEvent} from './event-queue';
 import {Observable, Subject} from 'rxjs';
-import {update, updateType} from './update';
+import {update, updateType, updaterFor} from './update';
 
 class State {
    prop1: number
@@ -162,7 +162,7 @@ describe('Store', () => {
 
    it('accepts deep partial updates', () => {
       store.updateState({
-         deepObject: val => update(val).with({
+         deepObject: val => update(val, {
             subProp1: 477
          })
       })
@@ -171,7 +171,7 @@ describe('Store', () => {
 
    it('accepts deep granular updates', () => {
       store.updateState({
-         deepObject: val => update(val).with({
+         deepObject: val => update(val, {
             subProp2: (val: string) => ''
          })
       })
@@ -183,7 +183,7 @@ describe('Store', () => {
          deepObject: updateType<{
             subProp1: number
             subProp2: string
-         }>().with({
+         }>({
             subProp2: ''
          })
       })
@@ -195,7 +195,20 @@ describe('Store', () => {
          deepObject: updateType<{
             subProp1: number
             subProp2: string
-         }>().with({
+         }>({
+            subProp2: () => ''
+         })
+      })
+      expect(state.deepObject.subProp2).to.equal('')
+   })
+
+   it('accepts deep granular generic updaters', () => {
+      const updateDeepObject = updaterFor<{
+         subProp1: number
+         subProp2: string
+      }>()
+      store.updateState({
+         deepObject: updateDeepObject({
             subProp2: () => ''
          })
       })
