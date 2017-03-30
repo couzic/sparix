@@ -110,7 +110,7 @@ export class Store<State extends Object> extends Core {
       this.dispatchEvent(operationResult.event)
    }
 
-   reset() {
+   resetState() {
       this.updateState(this.initialState)
    }
 }

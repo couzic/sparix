@@ -59,8 +59,8 @@ class TestStore extends Store<State> {
       super.applyResult(operationResult)
    }
 
-   reset() {
-      super.reset()
+   resetState() {
+      super.resetState()
    }
 }
 
@@ -106,7 +106,7 @@ describe('Store', () => {
       })
 
       it('can be reset', () => {
-         store.reset()
+         store.resetState()
          expect(state.prop1).to.equal(initialProp1Value)
       })
 
