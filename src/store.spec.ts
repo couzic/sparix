@@ -1,11 +1,10 @@
-import {expect} from 'chai';
-import {Store, DiffProvider, Operation, OperationResult, FutureUpdater, PartialDiff} from './store';
-import {EventQueue, CoreEvent} from './event-queue';
-import {Observable, Subject} from 'rxjs';
-import {update, updateType, updaterFor} from './update';
+import {expect} from 'chai'
+import {DiffProvider, Operation, OperationResult, PartialDiff, Store} from './store'
+import {CoreEvent, EventQueue} from './event-queue'
+import {update, updaterFor, updateType} from './update'
 
 class State {
-   prop1: number
+   prop1: string
    prop2: string
    dateProp: Date
    deepObject: {
@@ -15,15 +14,19 @@ class State {
    arrayProp: string[]
 }
 
-const initialProp1Value = 42
+const initialProp1Value = 'initialProp1Value'
+const updatedProp1Value = 'updatedProp1Value'
+
+const initialProp2Value = 'initialProp2Value'
+const updatedProp2Value = 'updatedProp2Value'
 
 const initialState: State = {
    prop1: initialProp1Value,
-   prop2: 'Whatever',
+   prop2: initialProp2Value,
    dateProp: new Date(),
    deepObject: {
-      subProp1: initialProp1Value,
-      subProp2: 'Sub Whatever'
+      subProp1: 42,
+      subProp2: initialProp2Value
    },
    arrayProp: ['1', '2', '3']
 }
@@ -56,20 +59,8 @@ class TestStore extends Store<State> {
       super.applyResult(operationResult)
    }
 
-   updateStateOnce(diff$: Observable<Object>) {
-      super.updateStateOnce(diff$)
-   }
-
-   updateStateMany(diff$: Observable<Object>) {
-      super.updateStateMany(diff$)
-   }
-
-   updateMany(updater$: FutureUpdater<State>) {
-      super.updateMany(updater$)
-   }
-
-   updateOnce(updater$: FutureUpdater<State>) {
-      super.updateOnce(updater$)
+   reset() {
+      super.reset()
    }
 }
 
@@ -102,22 +93,27 @@ describe('Store', () => {
    describe('initial state', () => {
 
       it('is immutable', () => {
-         expect(() => state.prop1 = 24).to.throw()
+         expect(() => state.prop1 = 'mutation').to.throw()
       })
 
    })
 
    describe('updated state', () => {
-      beforeEach(() => store.updateState({prop1: 24}))
+      beforeEach(() => store.updateState({prop1: updatedProp1Value}))
 
       it('is immutable', () => {
-         expect(() => state.prop1 = 12).to.throw()
+         expect(() => state.prop1 = 'mutation').to.throw()
+      })
+
+      it('can be reset', () => {
+         store.reset()
+         expect(state.prop1).to.equal(initialProp1Value)
       })
 
    })
 
    describe('.map()', () => {
-      let prop1History: number[]
+      let prop1History: string[]
       let deepObjectHistory: Array<{
          subProp1: number
          subProp2: string
@@ -139,14 +135,14 @@ describe('Store', () => {
       })
 
       it('does not send subsequent change notifications with same object', () => {
-         store.updateState({prop1: 12})
+         store.updateState({prop1: updatedProp1Value})
          expect(deepObjectHistory.length).to.equal(1)
       })
    })
 
    it('accepts updaters', () => {
-      store.update(s => ({prop1: s.prop1 + 1}))
-      expect(state.prop1).to.equal(43)
+      store.update(s => ({prop1: updatedProp1Value}))
+      expect(state.prop1).to.equal(updatedProp1Value)
    })
 
    it('accepts deep updates', () => {
@@ -225,10 +221,10 @@ describe('Store', () => {
    it('accepts operations', () => {
       const event: Event = new Event()
       store.execute(s => ({
-         update: {prop1: s.prop1 + 2},
+         update: {prop1: updatedProp1Value},
          event
       }))
-      expect(state.prop1).to.equal(44)
+      expect(state.prop1).to.equal(updatedProp1Value)
       expect(sentEvents.length).to.equal(1)
       expect(sentEvents[0]).to.equal(event)
    })
@@ -236,10 +232,10 @@ describe('Store', () => {
    it('accepts operation results', () => {
       const event: Event = new Event()
       store.applyResult({
-         update: {prop1: 124},
+         update: {prop1: updatedProp1Value},
          event
       })
-      expect(state.prop1).to.equal(124)
+      expect(state.prop1).to.equal(updatedProp1Value)
       expect(sentEvents.length).to.equal(1)
       expect(sentEvents[0]).to.equal(event)
    })
@@ -248,7 +244,7 @@ describe('Store', () => {
       beforeEach(() => {
          store.update(s => ({prop2: 'updated'}))
          store.update(s => ({prop2: 'updated'}))
-         store.update(s => ({prop1: 0}))
+         store.update(s => ({prop1: updatedProp1Value}))
       })
 
       it('the following updater receives a state', () => {
@@ -278,42 +274,6 @@ describe('Store', () => {
       it('does not create new state transition', () => {
          expect(stateTransitions.length).to.equal(1)
       })
-   })
-
-   it('accepts Observable diff', () => {
-      const diff$ = new Subject<Object>()
-      store.updateStateMany(diff$)
-      diff$.next({prop1: 1})
-      expect(state.prop1).to.equal(1)
-      diff$.next({prop1: 2})
-      expect(state.prop1).to.equal(2)
-   })
-
-   it('takes only first emitted diff when updating once', () => {
-      const diff$ = new Subject<Object>()
-      store.updateStateOnce(diff$)
-      diff$.next({prop1: 1})
-      diff$.next({prop1: 2})
-      expect(state.prop1).to.equal(1)
-   })
-
-   it('accepts Observable updater', () => {
-      const updater$ = new Subject<DiffProvider<State>>()
-      store.updateMany(updater$)
-      const updater: DiffProvider<State> = state => ({prop1: state.prop1 + 1})
-      updater$.next(updater)
-      expect(state.prop1).to.equal(43)
-      updater$.next(updater)
-      expect(state.prop1).to.equal(44)
-   })
-
-   it('executes only first updater when updating once', () => {
-      const updater$ = new Subject<DiffProvider<State>>()
-      store.updateOnce(updater$)
-      const updater: DiffProvider<State> = state => ({prop1: state.prop1 + 1})
-      updater$.next(updater)
-      updater$.next(updater)
-      expect(state.prop1).to.equal(43)
    })
 
 })

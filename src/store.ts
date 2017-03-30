@@ -1,16 +1,16 @@
-import 'rxjs/add/operator/distinctUntilChanged';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/scan';
-import 'rxjs/add/operator/share';
-import 'rxjs/add/operator/mergeAll';
-import {Subject} from 'rxjs/Subject';
-import {Observable} from 'rxjs/Observable';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {CoreEvent, EventQueue} from './event-queue';
-import {freeze} from './freeze';
-import {Core} from './core';
-import {update} from './update';
+import 'rxjs/add/operator/distinctUntilChanged'
+import 'rxjs/add/operator/filter'
+import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/scan'
+import 'rxjs/add/operator/share'
+import 'rxjs/add/operator/mergeAll'
+import {Subject} from 'rxjs/Subject'
+import {Observable} from 'rxjs/Observable'
+import {BehaviorSubject} from 'rxjs/BehaviorSubject'
+import {CoreEvent, EventQueue} from './event-queue'
+import {freeze} from './freeze'
+import {Core} from './core'
+import {update} from './update'
 
 export interface Mapper<State, R> {
    (state: State): R
@@ -19,8 +19,6 @@ export interface Mapper<State, R> {
 export interface DiffProvider<State> {
    (state: State): PartialDiff<State>
 }
-
-export type FutureUpdater<State> = Observable<DiffProvider<State>>
 
 export interface EventProvider<State> {
    (state: State): CoreEvent
@@ -49,14 +47,14 @@ export type PartialDiff<T> = {
 
 export class Store<State extends Object> extends Core {
 
-   private update$ = new Subject<FutureUpdater<State>>()
+   private update$ = new Subject<DiffProvider<State>>()
    private stateSubject$: BehaviorSubject<State>
 
-   constructor(private initialState: State, eventQueue?: EventQueue) {
+   constructor(private readonly initialState: State, eventQueue?: EventQueue) {
       super(eventQueue)
 
-      const stateReducer = (previousState: State, operation: DiffProvider<State>) => {
-         const diff = operation(previousState)
+      const stateReducer = (previousState: State, diffProvider: DiffProvider<State>) => {
+         const diff = diffProvider(previousState)
          if (diff === previousState) return previousState
          else return update(previousState, diff)
       }
@@ -64,7 +62,6 @@ export class Store<State extends Object> extends Core {
       this.stateSubject$ = new BehaviorSubject<State>(freeze(initialState))
 
       this.update$
-         .mergeAll()
          .scan(stateReducer, initialState)
          .map(freeze)
          .subscribe(this.stateSubject$)
@@ -91,7 +88,7 @@ export class Store<State extends Object> extends Core {
    }
 
    protected update(updater: DiffProvider<State>) {
-      this.update$.next(Observable.of(updater))
+      this.update$.next(updater)
    }
 
    protected updateState(diff: PartialDiff<State>) {
@@ -113,21 +110,7 @@ export class Store<State extends Object> extends Core {
       this.dispatchEvent(operationResult.event)
    }
 
-   protected updateStateMany(diff$: Observable<PartialDiff<State>>) {
-      const updater: FutureUpdater<State> = diff$.map(diff => (state: State) => diff)
-      this.update$.next(updater)
+   reset() {
+      this.updateState(this.initialState)
    }
-
-   protected updateStateOnce(diff$: Observable<PartialDiff<State>>) {
-      this.updateStateMany(diff$.take(1))
-   }
-
-   protected updateMany(updater$: FutureUpdater<State>) {
-      this.update$.next(updater$)
-   }
-
-   protected updateOnce(updater$: FutureUpdater<State>) {
-      this.updateMany(updater$.take(1))
-   }
-
 }
