@@ -83,6 +83,14 @@ export class Store<State extends Object> extends Core {
       return this.map(state => state[key])
    }
 
+   pick<K extends keyof State>(...keys: K[]): Observable<Pick<State, K>> {
+      return this.map(state => {
+         const partial: any = {}
+         keys.forEach(key => partial[key] = state[key])
+         return partial
+      })
+   }
+
    filter(predicate: Mapper<State, boolean>): Observable<State> {
       return this.state$.filter(predicate).distinctUntilChanged()
    }

@@ -30,7 +30,7 @@ export class Core {
    }
 
    private handleEvent<Event extends CoreEvent>(event: Event): void {
-      const handler: CoreEventHandler<Event> = this.eventHandlers.get(<EventClass<Event>> event.constructor)
+      const handler: CoreEventHandler<Event> = this.eventHandlers.get(<EventClass<Event>> event.constructor) as CoreEventHandler<Event>
       if (handler) {
          handler(event)
       }

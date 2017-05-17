@@ -8,7 +8,13 @@
     "declaration": true,
     "sourceMap": true,
     "noImplicitAny": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "lib": [
+      "dom",
+      "es5",
+      "es2015.promise",
+      "es2015.collection"
+    ]
   },
   "files": [
     "src/index.ts"

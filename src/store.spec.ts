@@ -276,5 +276,16 @@ describe('Store', () => {
       })
    })
 
+   it('picks multiple keys', () => {
+      const pick$ = store.pick('prop1', 'prop2')
+      let pick = null
+      pick$.subscribe(p => pick = p)
+
+      expect(pick).to.deep.equal({
+         prop1: initialProp1Value,
+         prop2: initialProp2Value
+      })
+   })
+
 })
 
