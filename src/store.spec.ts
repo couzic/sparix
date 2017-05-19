@@ -287,5 +287,14 @@ describe('Store', () => {
       })
    })
 
+   it('notifies once only when state is updated twice but pick stays the same', () => {
+      let notifications = 0
+      store.pick('prop1', 'prop2').subscribe(() => ++notifications)
+
+      store.updateState({arrayProp: []})
+
+      expect(notifications).to.equal(1)
+   })
+
 })
 

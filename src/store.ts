@@ -11,6 +11,7 @@ import {CoreEvent, EventQueue} from './event-queue'
 import {freeze} from './freeze'
 import {Core} from './core'
 import {update} from './update'
+import {shallowEqual} from './shallowEqual'
 
 export interface Mapper<State, R> {
    (state: State): R
@@ -84,11 +85,13 @@ export class Store<State extends Object> extends Core {
    }
 
    pick<K extends keyof State>(...keys: K[]): Observable<Pick<State, K>> {
-      return this.map(state => {
-         const partial: any = {}
-         keys.forEach(key => partial[key] = state[key])
-         return partial
-      })
+      return this
+         .map(state => {
+            const partial: any = {}
+            keys.forEach(key => partial[key] = state[key])
+            return partial
+         })
+         .distinctUntilChanged(shallowEqual)
    }
 
    filter(predicate: Mapper<State, boolean>): Observable<State> {
