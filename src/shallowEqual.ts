@@ -1,4 +1,4 @@
-export function shallowEqual<T>(objA: T, objB: T): boolean {
+export function shallowEqual(objA: any, objB: any): boolean {
 
    if (objA === objB) {
       return true
