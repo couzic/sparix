@@ -1,4 +1,4 @@
-# DEPRECATED in favor of [lenrix](https://github.com/couzic/lenrix) (which finally solves the single VS multi store problemhttps://github.com/couzic/lenrix)
+# DEPRECATED in favor of [lenrix](https://github.com/couzic/lenrix) (which finally solves the single VS multi store problem)
 
 # sparix
 
