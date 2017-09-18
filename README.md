@@ -1,3 +1,5 @@
+# DEPRECATED in favor of [lenrix](https://github.com/couzic/lenrix) (which finally solves the single VS multi store problemhttps://github.com/couzic/lenrix)
+
 # sparix
 
 #### Type-safe Single Page Application state management powered by RxJS
